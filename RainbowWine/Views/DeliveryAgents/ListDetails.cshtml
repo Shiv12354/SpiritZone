@@ -1,0 +1,111 @@
+﻿@model IEnumerable<RainbowWine.Data.RoutePlan>
+
+@{
+    ViewBag.Title = "ListDetails";
+    string agentname = default(string);
+    if (Model != null && Model.Count() > 0)
+    {
+        agentname = Model?.ToList()[0].DeliveryAgent.DeliveryExecName ?? "";
+    }
+}
+
+<h2>Details</h2>
+
+<h3> @agentname</h3>
+
+<p>
+    @Html.ActionLink("Back to List", "List")
+</p>
+    @if (Model != null && Model.Count() > 0)
+    {
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Order.Id)
+        </th>
+        @*<th>
+                @Html.DisplayNameFor(model => model.OrigPlaceID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoutePlanLink)
+            </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DeliveryStart)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.Order.DeliveryDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AssignedDate)
+        </th>
+        <th>
+            Zone Name
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Customer.CustomerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Customer.ContactNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Order.OrderPlacedBy)
+        </th>
+        <th>
+            Order Status
+        </th>
+        <th>
+            Shop Name
+        </th>
+        @*<th></th>*@
+    </tr>
+
+    @foreach (var item in Model)
+{
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.Id)
+    </td>
+    @*   <td>
+                @Html.DisplayFor(modelItem => item.OrigPlaceID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoutePlanLink)
+            </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DeliveryStart)
+        </td>*@
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.DeliveryDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.AssignedDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.DeliveryAgent.DeliveryZone.ZoneName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Customer.CustomerName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Customer.ContactNo)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.OrderPlacedBy)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.OrderStatu.OrderStatusName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.WineShop.ShopName)
+    </td>
+    @*<td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.id })
+        </td>*@
+</tr>
+}
+
+</table>
+
+    }

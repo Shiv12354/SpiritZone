@@ -1,0 +1,326 @@
+﻿@model RainbowWine.Models.OrderDetailsView
+
+@{
+    ViewBag.Title = "Pack";
+    string nodata = ViewBag.NoData;
+    string userType = ViewBag.UserType as string;
+    double permitAmt = Convert.ToDouble(System.Configuration.ConfigurationManager.AppSettings["PremitValue"]);
+    var baseUrl = System.Configuration.ConfigurationManager.AppSettings["PtmSpiritUrl"];
+}
+@if (nodata == "0")
+{<h2>No Data</h2>}
+else
+{
+    <p></p>
+
+    if (userType.ToLower() == "packer")
+    {
+        <div class="row">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-actions no-color">
+                    <input type="submit" value="Done" class="btn btn-default" onclick="return confirm('Are you sure you want to mark this order as Packed?');" /> | <button class="btn btn-default" onclick="printRow()">Print</button> | <input type="button" class="btn btn-default" onclick="AllIssue()" disabled id="btnIssue" value="Issue"> |
+                    @Html.ActionLink("Back to List", "PackList")
+                </div>
+            }
+        </div>
+    }
+
+
+    <div class="row" id="divPrint">
+        <hr />
+        <div class="col-md-12">
+            <div><h3>Order Number: @Model.Ord.Id</h3></div>
+            <div><h3>Date: @Model.Ord.OrderDate.ToString("dd/MM/yyyy") </h3></div>
+        </div>
+        <div class="col-md-12 ">
+            <hr />
+            <h2>SPIRITZONE</h2>
+            <h3>@Html.DisplayFor(model => model.Ord.WineShop.ShopName)</h3>
+            @Html.DisplayFor(model => model.Ord.WineShop.Address)
+            <div><h6><b>GST No.</b>:- @Html.DisplayFor(model => model.Ord.WineShop.GST)</h6></div>
+            <div><h6><b>VAT No.</b>:- @Html.DisplayFor(model => model.Ord.WineShop.VAT)</h6></div>
+        </div>
+        <div>
+            <hr />
+            <div class="col-md-2"><label> Customer Name</label></div>
+            <div class="col-md-6">@Html.DisplayFor(model => model.Cust.CustomerName)</div>
+            <div class="col-md-2"><label>Permit Number</label></div>
+            <div>@Html.DisplayFor(model => model.Ord.LicPermitNo)</div>
+        </div>@*
+            <div class="col-md-12 ">
+                <hr />
+                <div class="col-md-2"><label>Address</label></div>
+                <div> @Html.DisplayFor(model => model.Cust.Address)</div>
+                <div> @Html.DisplayFor(model => model.Cust.Flat) @Html.DisplayFor(model => model.Cust.Landmark) </div>
+            </div>*@
+
+        <div class="col-md-12 ">
+            <hr />
+            <h4>Product Items</h4>
+        </div>
+        <div class="col-md-12 ">
+            <table class="table">
+                <tr>
+                    <th>
+                        ItemQty
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        ProductName
+                    </th>
+                    <th>
+                        Goodies Name
+                    </th>
+                    <th>
+                        Discount %
+                    </th>
+                    <th>
+                        Discount Amt
+                    </th>
+                    <th>
+                        Total Amt
+                    </th>
+                    <th>
+                        Issue
+                    </th>
+                    <th>
+                        View
+                    </th>
+                    <th></th>
+                </tr>
+
+                @{
+
+                    int srno = 0;
+                    decimal totalamt = 0;
+                    decimal mtotalamt = 0;
+                    int totalqty = 0;
+                    int mtotalqty = 0;
+                    decimal ttotalamt = 0;
+                    decimal gtotalamt = 0;
+
+
+                    foreach (var item in Model.CurOrdDetail)
+                    {
+
+                        decimal amt = item.Price * item.ItemQty;
+
+                        if ((item.DiscountProductId ?? 0) > 0)
+                        {
+                            amt -= Convert.ToDecimal(item.DiscountAmount);
+                        }
+
+                        totalamt = totalamt + amt;
+                        totalqty = totalqty + item.ItemQty;
+                        srno = srno + 1;
+                        var url = baseUrl + item.ProductDetail.ProductImage;
+
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ItemQty)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ProductDetail.ProductName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.GName)
+                            </td>
+                            <td>
+                                @item.DiscountUnit
+                            </td>
+                            <td>
+                                @item.DiscountAmount
+                            </td>
+                            <td>
+                                @amt
+                            </td>
+                            <td>
+                                <input type="checkbox" name="Issue" value="@item.Id" class="checkBox" onclick="IssueCheckboxChecked()" />
+                            </td>
+                            <td>
+                                @*@item.ProductDetail.ProductImage*@
+                                <a href="@url" target="_blank" rel="noopener noreferrer">View</a>
+                            </td>
+                        </tr>
+                    }
+                    foreach (var item in Model.MixerItems)
+                    {
+
+                        decimal amt1 = Convert.ToDecimal(item.Price) * Convert.ToDecimal(item.ItemQty);
+
+
+                        mtotalamt = mtotalamt + amt1;
+                        mtotalqty = mtotalqty + item.ItemQty.Value;
+                        srno = srno + 1;
+                        var murl = baseUrl + item.MixerDetail.Mixer.MixerImage;
+
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ItemQty)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MixerDetail.Mixer.MixerName)
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                @amt1
+                            </td>
+                            <td>
+                                <input type="checkbox" name="Issue" value="@item.MixerOrderItemId" class="checkBox" onclick="IssueCheckboxChecked()" />
+                            </td>
+                            <td>
+                                <a href="@murl" target="_blank" rel="noopener noreferrer">View</a>
+                                @*@Html.DisplayFor(modelItem => item.MixerDetail.Mixer.MixerImage)*@
+                            </td>
+                        </tr>
+                    }
+                    foreach (var item in Model.GiftBagItems)
+                    {
+
+                        decimal amt2 = Convert.ToDecimal(item.Price) * Convert.ToDecimal(item.ItemQty);
+
+
+                        mtotalamt = mtotalamt + amt2;
+                        mtotalqty = mtotalqty + item.ItemQty.Value;
+                        srno = srno + 1;
+
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ItemQty)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.GiftBagName)
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                @amt2
+                            </td>
+                            <td>
+                                <input type="checkbox" name="Issue" value="@item.GiftBagOrderItemId" class="checkBox" onclick="IssueCheckboxChecked()" />
+                            </td>
+                            <td>
+                                <a href="@item.ImageUrl" target="_blank" rel="noopener noreferrer">View</a>
+
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+        @{
+            if (string.IsNullOrWhiteSpace(Model.Ord.LicPermitNo))
+            {
+
+
+                ttotalamt = totalamt + mtotalamt;
+                gtotalamt = ttotalamt + Convert.ToDecimal(permitAmt);
+                <div class="col-md-12 ">
+                    <hr />
+                    <h4>Permit Amount: @permitAmt</h4>
+                </div>
+            }
+            else
+            {
+                ttotalamt = totalamt + mtotalamt;
+                permitAmt = 0;
+                gtotalamt = ttotalamt + Convert.ToDecimal(permitAmt);
+                <div class="col-md-12 ">
+                    <hr />
+                    <h4>Permit Amount: @permitAmt</h4>
+                </div>
+            }
+        }
+
+        <div class="col-md-12 ">
+            <hr />
+            <h4>Total Amount: @ttotalamt</h4>
+        </div>
+
+        <div class="col-md-12 ">
+            <hr />
+            <h4>Discount %: @Model.Ord.DiscountUnit</h4>
+        </div>
+        @*<div class="col-md-12 ">
+                <hr />
+                <h4>Discount Amount: @Model.Ord.DiscountAmount</h4>
+            </div>*@
+        <div class="col-md-12 ">
+            <hr />
+            <h4>Grand Total Amount: @gtotalamt</h4>
+        </div>
+
+    </div>
+
+    @section scripts{
+        <script>
+            function printRow() {
+                var restorepage = document.body.innerHTML;
+                var printcontent = document.getElementById('divPrint').innerHTML;
+                document.body.innerHTML = printcontent;
+                window.print();
+                document.body.innerHTML = restorepage;
+            }
+            function IssueCheckboxChecked() {
+                var isChecked = false;
+                $('input:checkbox.checkBox').each(function () {
+                    if ($(this).prop('checked')) {
+                        isChecked = true;
+                    }
+                });
+                $('#btnIssue').prop('disabled', !isChecked);
+                //if (isChecked) {
+                //    false }
+                //else { }
+            }
+            function AllIssue() {
+                if (confirm("Are you sure do you want to mark the order as an issue.")) {
+                    var selectedIDs = new Array();
+                    $('input:checkbox.checkBox').each(function () {
+                        if ($(this).prop('checked')) {
+                            selectedIDs.push($(this).val());
+                        }
+                    });
+
+                    var options = {};
+                    options.url = "/orders/PackIssue";
+                    options.type = "POST";
+                    options.data = JSON.stringify({ id:@Model.Ord.Id, odetailIds: selectedIDs });
+                    options.contentType = "application/json";
+                    options.dataType = "json";
+                    options.success = function (data) {
+                        alert(data.msg);
+                        if (data.status) { window.location = "/orders/PackList" }
+                    };
+                    options.error = function () {
+                        alert("Error while Issue the records!");
+                    };
+                    $.ajax(options);
+                }
+            }
+        </script>
+    }
+}

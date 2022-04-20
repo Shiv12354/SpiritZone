@@ -1,0 +1,145 @@
+﻿@model RainbowWine.Data.RoutePlan
+
+@{
+    ViewBag.Title = "ShowTracking";
+}
+
+<h2>ShowTracking</h2>
+
+<div>
+    <h4>RoutePlan</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DestPlaceID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DestPlaceID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OrigPlaceID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrigPlaceID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RoutePlanLink)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RoutePlanLink)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DeliveryStart)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeliveryStart)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DeliveryEnd)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeliveryEnd)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AssignedDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AssignedDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ZoneID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ZoneID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SlotStart)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SlotStart)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SlotEnd)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SlotEnd)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.JobId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.JobId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isOutForDelivery)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isOutForDelivery)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Customer.UserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Customer.UserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DeliveryAgent.DeliveryExecName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeliveryAgent.DeliveryExecName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Order.OrderPlacedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Order.OrderPlacedBy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OrderStatu.OrderStatusName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OrderStatu.OrderStatusName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WineShop.ShopName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WineShop.ShopName)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>

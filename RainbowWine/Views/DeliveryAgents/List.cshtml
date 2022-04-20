@@ -1,0 +1,225 @@
+﻿@model IEnumerable<RainbowWine.Data.DeliveryAgent>
+
+@{
+    ViewBag.Title = "List";
+    string track = "";
+}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap.min.css">
+<script src="~/Scripts/jquery.min.js"></script>
+<script src="~/Scripts/jquery-ui.js"></script>
+<script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap.min.js"></script>
+
+
+
+<h2>List</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<p>
+    <input type="text" placeholder="Shop Name" id="txtShopSearch" value="@ViewBag.ShopName" />
+    @Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)@ViewBag.ShopId, "Select Shop", htmlAttributes: new { @class = "form-control", @id = "dpShopId", @style = "display:none;" })
+
+    <input type="text" placeholder="Delivery Agent Name" id="txtDeliveryAgentSearch" value="@ViewBag.AgentName" />
+    @Html.DropDownList("dpAgentId", (IEnumerable<SelectListItem>)@ViewBag.AgentId, "Select Agent", htmlAttributes: new { @class = "form-control", @id = "dpAgentId", @style = "display:none;" })
+
+    <button id="btnSearch"> Search</button>
+    <input type="button" value="Track All Agents" target="_blank" onclick="window.open('@Url.Action("TrackAllAgents", "DeliveryAgents")','_blank')" />
+    <div> @*@Html.ActionLink("Track All Agents", "TrackAllAgents", new { controller = "DeliveryAgents" }, new { target = "_blank" })*@</div>
+</p>
+<table class="table table-striped table-bordered" id="listtable">
+    <thead>
+        <tr>
+            <th>
+                Delivery Agenet Name
+            </th>
+            <th>
+                Last Delivery On
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contact)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WineShop.ShopName)
+            </th>
+            <th>
+                On/Off
+            </th>
+            <th>
+                Zone Name
+            </th>
+            <th>
+                On Date
+            </th>
+            <th>
+                Off Date
+            </th>
+            <th>
+                IsActive
+            </th>
+            <th></th>
+        </tr>
+
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryExecName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastDeliveryOn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contact)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WineShop.ShopName)
+                </td>
+                <td>
+                    @{
+                        DateTime dt = DateTime.Now;
+                        var delogin = item.DeliveryAgentLogins.Where(o => o.OnDuty.Year == dt.Year && o.OnDuty.Month == dt.Month && o.OnDuty.Day == dt.Day);
+                        string onoff = (delogin.Count() > 0) ? "On" : "Off";
+                        var todayLog = delogin?.FirstOrDefault();
+
+                    }
+                    <font style="color:@(onoff == "On" ? "green" : "red")"> <b>@onoff</b></font>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryZone.ZoneName)
+                    @*@foreach (var zoneItem in item.WineShop.DeliveryZones)
+                        {
+                            @(zoneItem.ZoneName + ", ")
+                        }*@
+                </td>
+                <td>
+                    @{if (todayLog != null) { todayLog.OnDuty.ToString(); }
+                    }
+                </td>
+                <td>
+                    @{if (todayLog != null) { todayLog.OffDuty.ToString(); }
+                    }
+                </td>
+                <td>
+                    <a href="#" class="ankYesNo" lang="@item.Id">
+                        @{
+                            @(item.isActive == 0 ? "Yes" : "No")
+                        }
+                    </a>
+                </td>
+                <td>
+                    @if (ViewBag.TrackDelAgent != null)
+                    {
+                        track = ViewBag.TrackDelAgent.Replace("deliveryAgentId", item.Id.ToString());
+
+                    }
+                    @Html.ActionLink("Edit", "ListEdit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "ListDetails", new { id = item.Id }) |
+                    @Html.ActionLink("Login Details", "LoginDetails", new { id = item.Id }) |
+                    @Html.ActionLink("Track Agent", "TrackDelAgent", new { controller = "DeliveryAgents", id = item.Id }, new { target = "_blank" })
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+    
+</table>
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $.noConflict();
+            $('#listtable').DataTable({
+                "searching": true,
+                "lengthChange": false
+            });
+        });
+
+
+        $("#txtShopSearch").autocomplete({
+            source: function (request, response) {
+                $('#dpShopId').val('').attr("selected", "selected");
+                $.ajax({
+                    url: "/orders/SearchShop",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+                $('#dpShopId').val(ui.item.Id).attr("selected", "selected");
+            }
+        });
+        $("#txtDeliveryAgentSearch").autocomplete({
+            source: function (request, response) {
+                $('#dpAgentId').val('').attr("selected", "selected");
+                $.ajax({
+                    url: "/orders/SearchDeliveryAgent",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                $('#dpAgentId').val(ui.item.Id).attr("selected", "selected");
+            }
+        });
+        $('#btnSearch').click(function () {
+            var shopname = $('#txtShopSearch').val();
+            var shop = $('#dpShopId').val();
+            var agentname = $('#txtDeliveryAgentSearch').val();
+            var agent = $('#dpAgentId').val();
+            window.location = "/DeliveryAgents/List?shop=" + shop + "&shopname=" + shopname + "&agent=" + agent + "&agentname=" + agentname;
+        })
+        $('.ankYesNo').click(function () {
+
+            if (confirm("Are you sure do you want to change the status.")) {
+                $.post("/DeliveryAgents/UpdateDelAgentStatus",
+                    {
+                        "id": $(this).attr('lang')
+                    },
+                    function (data) {
+                        console.log(data);
+                        if (data != undefined) {
+                            alert(data.msg);
+                            window.location.reload();
+                        }
+                    }
+                );
+            }
+            return false;
+        })
+    </script>
+}
+

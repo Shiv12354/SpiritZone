@@ -1,0 +1,110 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.ZoneDO>
+
+@{
+    ViewBag.Title = "List";
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 10, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.FirstLast);
+    string ShopName = (Model != null && Model.Count() > 0) ? Model.ToList()[0].ShopName : "";
+}
+<h2>Zone List</h2>
+<br />
+<h3>
+    @Html.ActionLink("Config Master", "ConfigMaster")</h3>
+<br />
+
+@if (Model != null && Model.Count() > 0)
+{
+<div>
+    @grid.GetHtml(tableStyle: "table",
+                    headerStyle: "",
+                    alternatingRowStyle: "alt",
+                    selectedRowStyle: "select",
+                    htmlAttributes: new { @id = "WebGrid" },
+                    columns: grid.Columns(
+
+grid.Column("Id",
+format:@<text>
+        @Html.ActionLink(((int)item.ZoneID).ToString(), "Edit", new { id = item.ZoneID })
+</text>),
+grid.Column("Zone Name", style: "col2",
+format:@<text>
+        @Html.Label((string)item.ZoneName, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Shop Name", style: "col4",
+format:@<text>
+            @Html.Label(((string)item.ShopName).ToString(), new { @class = "normal-mode" })
+
+            @Html.TextBox("ShopName", ((string)item.ShopName).ToString(), new { @class = "hide", style = "width: 100px;", @id = "ShopName" })
+            @Html.TextBox("ShopId", ((Int32)item.ShopId).ToString(), new { @class = "hide", style = "width: 100px;", @id = "ShopId" })
+            @Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)@ViewBag.Shops, "Select Shop", htmlAttributes: new { @class = "edit-mode", @id = "dpShopId" })
+</text>
+),
+grid.Column("Flag", style: "col6",
+format: @<text>
+            @Html.Label(((bool)item.OperationalFlag).ToString(), new { @class = "display-mode" })
+            @Html.DropDownList("OperationalFlag", new List<SelectListItem>
+                            { new SelectListItem{Text="False", Value="0",Selected=@item.OperationalFlag},
+                     new SelectListItem{Text="True", Value="1",Selected=@item.OperationalFlag}}, new { @class = "edit-mode" })
+</text>
+), grid.Column("",
+style: "col7",
+format: @<text><div style="padding-left:20px;">
+                <button class="btn btn-default edit-item display-mode " id="@item.ZoneID">Edit</button>
+                <button class="btn btn-default save-item edit-mode" id="@item.ZoneID">Save</button>
+                <button class="btn btn-default cancel-item edit-mode" id="@item.ZoneID">Cancel</button>
+            </div>
+</text>)
+)
+)
+
+</div>
+}
+else
+{
+    <h3>No Data</h3>
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            $('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            var shopName = tr.find('#ShopName').val();
+            tr.find("#dpShopId option:selected").text(shopName);
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            var zoneId = $(this).prop('id');
+            var ShopNameId = tr.find('#ShopId').val();
+            var shopId = tr.find("#dpShopId option:selected").val();
+            var flag = tr.find("#OperationalFlag option:selected").text();
+            if (shopId == '') {
+                shopId = ShopNameId;
+            }
+            $.post(
+                '/Orders/UpdateZoneDetail/',
+                { zoneId: zoneId, shopId: shopId, flag: flag },
+                function (item) {
+                    tr.find('#ShopName').text(item.ShopName);
+                    tr.find("#OperationalFlag option:selected").text(item.OperationalFlag);
+                    tr.find("#dpShopId option:selected").text(item.ShopID);
+                    alert(item.Message);
+                    if (item.status == true)
+                        window.location.replace("ZoneIndex");
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+    </script>
+
+}

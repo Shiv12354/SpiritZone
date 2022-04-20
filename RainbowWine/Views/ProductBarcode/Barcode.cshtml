@@ -1,0 +1,213 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.ProductDetailsExtDO>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>PRODUCT BARCODE SEARCH</h2>
+<p>@Html.ActionLink("ProductBarcode", "Index", "ProductBarcode")</p>
+<div class="row">
+    @*<div class="col-md-4">
+            <input type="text" placeholder="Product Name" id="txtProductSearch" value="@ViewBag.ProductName" />
+            @Html.DropDownList("dpProductDetailId", (IEnumerable<SelectListItem>)@ViewBag.ProductDetailId, "Select ProductDetail", htmlAttributes: new { @class = "form-control", @id = "dpProductDetailId", @style = "display:none;" })
+
+        </div>*@
+
+    <div class="col-md-2">
+        <input type="text" placeholder="Status" id="txtBarcodeSearch" value="@ViewBag.BarName" />
+
+    </div>
+    <div class="col-md-1">
+        <button id="btnSearch">Search</button>
+    </div>
+</div>
+<p></p>
+@foreach (var item in Model)
+{
+    <div>
+
+        <table class="table">
+            <tr>
+                <th>
+                    Product Id
+                </th>
+                <th>
+                    Product Name
+                </th>
+                <th>
+                    Volume
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Packing Size
+                </th>
+                <th>
+                    Barcode Id
+                </th>
+                <th>
+                    Shop Name
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var barItem in item.ProductBarcodeLinks)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.prdSize.Capacity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Size)
+                    </td>
+                    <td>
+                        @Html.Label(barItem.BarcodeID.ToString(), new { @class = "display-mode", @id = "txtBarcodeId" })
+                        @Html.TextBox("BarcodeId-Edit", barItem.BarcodeID.ToString(), new { @class = "edit-mode", style = "width: 150px;" })
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => barItem.Shop.ShopName)
+                    </td>
+                    <td>
+                        <button class="btn_grid edit-item display-mode" id="@barItem.Id">Edit</button>
+                        <button class="btn_grid delete-item display-mode" id="@barItem.Id">Delete</button>
+                        <button class="btn_grid save-item edit-mode" id="@barItem.Id">Save</button>
+                        <button class="btn_grid cancel-item edit-mode" id="@barItem.Id">Cancel</button>
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+
+    @*<div>
+            <div>
+                <input type="text" placeholder="Barcode" id="txtAddBarcode" />
+                @Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)@ViewBag.ShopId, "Select Shop", htmlAttributes: new { @class = "form-control", @id = "dpShopId" })
+                <button id="btnAdd" data-prod="@item.ProductID">Add</button>
+            </div>
+        </div>*@
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $('#btnAdd').click(function () {
+            var barId = $('#txtAddBarcode').val();
+            var shopId = $('#dpShopId').val();
+
+            var prodId = $(this).attr('data-prod');
+            console.log(prodId);
+            if (barId == undefined || barId == '') { alert('Please enter barcode') }
+            else if (shopId == undefined || shopId == '') { alert('Please enter shop.') }
+            else if (prodId == undefined || prodId == '') { alert('Product Id is missing.') }
+            else {
+                $.post(
+                    '/ProductBarcode/AddBarcode/',
+                    { barId: barId, shopId: shopId, prodId: prodId },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.status)
+                                window.location.reload();
+                            else
+                                alert('Unable to delete the barcode.');
+                        }
+                    }, "json");
+            }
+
+        });
+        $("#txtBarcodeSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchBarcode",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                //console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                var bid = ui.item.Id;
+                $('#dpBarCodeId').val(bid).attr("selected", "selected");
+            }
+        });
+        $('#btnSearch').click(function () {
+            var barname = $('#txtBarcodeSearch').val();
+
+            window.location = "/ProductBarcode/Barcode?barname=" + barname;
+
+            //if (shopid != '' || statusid != '' || soid != '') {
+            //    window.location = "/orders/index?shopId=" + shopid + "&shopname=" + shopname + "&statusId=" + statusid + "&statusname=" + statusname + "&soid=" + soid;
+            //}
+        });
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            //$('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            //console.log("DD");
+            var tr = $(this).parents('tr:first');
+            var id = $(this).prop('id');
+            var barcode = tr.find('#BarcodeId-Edit').val();
+            $.post(
+                '/ProductBarcode/UpdateBarcode/',
+                { bId: id, barId: barcode },
+                function (item) {
+                    tr.find('#txtBarcodeId').text(id);
+                    tr.find('#BarcodeId-Edit').val(barcode);
+                    if (item != undefined) {
+                        if (item.status)
+                            window.location.reload();
+                        else
+                            alert('Unable to update the barcode.');
+                    }
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+
+        $('.delete-item').on('click', function () {
+            if (confirm('Are you sure do you want to delete it?')) {
+                //console.log("DD");
+                var tr = $(this).parents('tr:first');
+                var id = $(this).prop('id');
+                var barcode = tr.find('#BarcodeId-Edit').val();
+                $.post(
+                    '/ProductBarcode/DeleteBarcode/',
+                    { bId: id },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.status)
+                                window.location.reload();
+                            else
+                                alert('Unable to delete the barcode.');
+                        }
+                    }, "json");
+            }
+        });
+    </script>
+
+}

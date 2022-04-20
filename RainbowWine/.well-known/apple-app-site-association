@@ -1,0 +1,11 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "H79C5KCA57.com.boxwish.spiritzone",
+                "paths": [ "/product/*"]
+            }
+        ]
+    }
+}

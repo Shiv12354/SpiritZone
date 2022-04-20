@@ -1,0 +1,191 @@
+﻿@model IEnumerable<RainbowWine.Data.OrderIssue>
+
+@{
+    ViewBag.Title = "Issue";
+}
+
+<h2>Issue Orders</h2>
+
+<p>
+
+</p>
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $("#txtStatusSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchStatus",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                var sid = ui.item.Id;
+                $('#dpStatusId').val(sid).attr("selected", "selected");
+            }
+        });
+        $("#txtIssueStatusSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchIssueStatus",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                var sid = ui.item.Id;
+                $('#dpIssueStatusId').val(sid).attr("selected", "selected");
+            }
+        });
+        $("#txtOrderSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchOrder",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+        $('#btnSearch').click(function () {
+            var statusid = $('#dpStatusId').val();
+            var statusname = $('#txtStatusSearch').val();
+            var issuestatusid = $('#dpIssueStatusId').val();
+            var issuestatusname = $('#txtIssueStatusSearch').val();
+            var soid = $('#txtOrderSearch').val();
+            if (issuestatusname == '') issuestatusid = 0;
+            if (statusname == '') statusid = 0;
+            window.location = "/issue?statusId=" + statusid + "&statusname=" + statusname + "&soid=" + soid + "&issuestatusId=" + issuestatusid + "&issuestatusname=" + issuestatusname;
+        })
+        $('#btnClearSearch').click(function () {
+            window.location = "/issue";
+        })
+    </script>
+}
+<table border="0" cellpadding="1" cellspacing="1">
+    <tr>
+        <td>
+            <input type="text" placeholder="Order Status" id="txtStatusSearch" value="@ViewBag.StatusName" />
+            @Html.DropDownList("dpStatusId", (IEnumerable<SelectListItem>)@ViewBag.StatusId, "Select Status", htmlAttributes: new { @class = "form-control", @id = "dpStatusId", @style = "display:none;" })
+        </td>
+        <td>
+            <input type="text" placeholder="Issue Status" id="txtIssueStatusSearch" value="@ViewBag.IssueStatusName" />
+            @Html.DropDownList("dpIssueStatusId", (IEnumerable<SelectListItem>)@ViewBag.IssueTypeId, "Select Status", htmlAttributes: new { @class = "form-control", @id = "dpIssueStatusId", @style = "display:none;" })
+        </td>
+        <td>
+            <input type="text" placeholder="Order Id" id="txtOrderSearch" value="@(ViewBag.soid==0?"":ViewBag.soid)" />
+        </td>
+        <td>
+            <button id="btnSearch"> Search</button>
+            <button id="btnClearSearch">Clear Search</button>
+        </td>
+    </tr>
+</table>
+<table class="table">
+    <tr>
+        <th>
+            Issue Id
+        </th>
+        <th>
+            Order Id
+        </th>
+        <th>
+            Issue Date
+        </th>
+        <th>
+            Order Date
+        </th>
+        <th>
+            Cusotmer Name
+        </th>
+        <th>
+            Issue Status
+        </th>
+        <th>
+            Issue Order Status
+        </th>
+        <th>
+            Order Status
+        </th>
+        <th>
+            Gift Order
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderIssueId)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderId)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.CreatedDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.OrderDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.Customer.CustomerName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderIssueType.IssueTypeName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderIssueType1.IssueTypeName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Order.OrderStatu.OrderStatusName)
+    </td>
+    <td>
+       
+            @if (item.Order.IsGift == true)
+            {
+    <div>Yes</div> }
+else
+{
+    <div>No</div>}
+    </td>
+    <td>
+        @Html.RouteLink("Details", "IssueDetail", new { id = item.OrderIssueId })
+        
+        @if (ViewBag.UserType == "Shopper")
+        {@("| ") @Html.RouteLink("Tracks", "GetIssuesOrdersTrack", new { id = item.OrderIssueId })}
+    </td>
+</tr>
+    }
+
+</table>

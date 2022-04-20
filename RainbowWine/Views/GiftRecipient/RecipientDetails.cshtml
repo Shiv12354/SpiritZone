@@ -1,0 +1,287 @@
+﻿@model RainbowWine.Services.DO.UserRecipientOrderDO
+@{
+    ViewBag.Title = "Recipient Details";
+    var baseUrl = System.Configuration.ConfigurationManager.AppSettings["PtmSpiritUrl"];
+
+    Layout = null;
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+
+<!--Same font as Spiritzone.in (Montserrat)-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Euphoria+Script&family=Montserrat:wght@300&display=swap" rel="stylesheet">
+
+<style>
+    /*.centered {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }*/
+
+    body {
+        width: 100%;
+        background-color: #fffff7;
+        font-family: "Montserrat", sans-serif;
+    }
+    /* Disabling the HR tag */
+    hr {
+        display: none;
+    }
+
+    .sz-header {
+        font-weight: bolder;
+        font-size: 15px;
+        font-family: 'Times New Roman';
+    }
+
+    .navbar {
+        /*background-color: #8e0033 !important;*/
+        background: linear-gradient( 45deg,#8e0033 0%,#d00f54 100%);
+    }
+
+    .navbar-brand {
+        font-weight: bolder;
+        color: white !important;
+    }
+
+    .navbar-nav a {
+        font-weight: bold;
+        color: white !important;
+    }
+
+    .navbar-inverse, .navbar-collapse {
+        border: none;
+    }
+
+    .sz-logo {
+        margin-top: -40px;
+        max-width: 120px;
+    }
+
+    .sz-color {
+        color: #8e0033;
+    }
+
+    .sz-bold {
+        font-weight: bolder;
+    }
+
+    .sz-label {
+        font-weight: bold;
+    }
+
+    .sz-input {
+        padding: 8.5px 5px 8.5px 15px;
+        border-radius: 100px;
+        border: 1px solid #8e0033;
+    }
+
+        .sz-input::placeholder {
+            font-weight: bolder;
+        }
+
+    .sz-btn {
+        color: white;
+        font-weight: bolder;
+        border-radius: 50px;
+        background: linear-gradient( 45deg,#8e0033 0%,#d00f54 100%);
+    }
+
+        .sz-btn:hover {
+            color: white;
+        }
+
+        .sz-btn:active {
+            background-color: #8e0033;
+            color: white;
+        }
+
+    .sz-greet-img {
+        margin: 0px;
+        border-radius: 10px;
+    }
+
+    /* .sz-occasion, .sz-splMessage, .sz-cursive {
+        font-family: 'Euphoria Script', cursive;
+    } */
+
+    .sz-cursive {
+        font-size: 150%;
+    }
+
+    .sz-splMessage {
+        font-size: 130%;
+    }
+
+    /* Hiding the arrows from the Input tags */
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    /* Placing the image text at the center */
+    .img-text {
+        font-weight: bolder;
+        position: absolute;
+        top: 37%;
+        left: 44%;
+        width: 200px;
+    }
+
+    /* Media Query for the greeting image */
+
+    @@media screen and (max-width: 375px) {
+        .sz-greet-img {
+            max-width: 90%;
+        }
+    }
+
+    body {
+        margin: 0px;
+    }
+
+    .height-100vh {
+        display: flex; /* establish flex container */
+        flex-direction: column; /* stack flex items vertically */
+        position: relative; /* establish nearest positioned ancenstor for absolute positioning */
+    }
+
+    .text {
+        position: absolute;
+        left: 42%;
+        top: 33%;
+        transform: translate(-50%, -50%);
+        font-weight: bold;
+    }
+
+    .center-aligned {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* Media queries for text */
+    @@media screen and (max-width: 1200px) {
+        .text {
+            left: 41%;
+        }
+    }
+
+    @@media screen and (max-width: 980px) {
+        .text {
+            left: 38%;
+        }
+    }
+
+    @@media screen and (max-width: 750px) {
+        .text {
+            left: 35%;
+        }
+    }
+
+    @@media screen and (max-width: 550px) {
+        .text {
+            left: 31%;
+        }
+    }
+
+    @@media screen and (max-width: 500px) {
+        .text {
+            left: 28%;
+        }
+    }
+
+    @@media screen and (max-width: 450px) {
+        .text {
+            left: 24%;
+        }
+    }
+
+    @@media screen and (max-width: 400px) {
+        .text {
+            left: 20%;
+            top: 25%;
+        }
+    }
+
+    @@media screen and (max-width: 350px) {
+        .text h3 {
+            font-size: 100%;
+        }
+
+        .text {
+            left: 13%;
+            top: 29%;
+        }
+    }
+
+    @@media screen and (max-width: 300px) {
+        .text {
+            left: 6%;
+            top: 29%;
+        }
+    }
+</style>
+
+
+@if (Model != null)
+{
+    var url = baseUrl + Model.GiftUrl;
+    <div class="text-center container" style="text-align:center">
+        <!--Removing these classes from img  rounded mx-auto d-block-->
+        <!-- <div><img src="https://dev.spiritzone.in/content/images/icon/sz_logo_91121.png" class="text-center" alt="..."></div><br /> -->
+        <img class="sz-logo" src="https://play-lh.googleusercontent.com/77K8_yfRQEuagn1wzGtVqmsPOogauY-YN9nvxg12GOvWdjDalTq_Iqhr9sT0SFwhxvU" alt="Spiritzone" />
+        <p class="sz-header sz-color">SPIRITZONE</p>
+
+        <div><h3 class="sz-color sz-bold">Hello @Model.RecipientName</h3></div>
+        <div><h3 class="sz-cursive">@Model.CustomerName Has Sent you a special message via <span class="sz-color">Spiritzone</span></h3></div><!--<br />-->
+        <section class="height-100vh center-aligned">
+
+            @if (Model.Occasion != "Anniversary" && @Model.Occasion != "Birthday" && @Model.Occasion != "Wedding")
+            {
+                // This means it's a generalized event
+                <div class="sz-message text-center">
+                    <!--<img src="@url" class="rounded mx-auto d-block sz-greet-img" alt="...">-->
+                    <h2 class="sz-color sz-bold sz-occasion">@Model.Occasion</h2>
+                </div>
+            }
+            else
+            {
+                <img src="@url" class="rounded mx-auto d-block sz-greet-img" alt="...">
+                // Either event, Birthday, Anniversary or Wedding, so don't show the message
+            }
+        </section>
+
+        <h3><span class="sz-color sz-splMessage">@Model.SplMessage</span></h3><br /><br />
+        <div class="app_download wow fadeInDown row" data-wow-duration="1s" data-wow-delay=".1s">
+            <a href="https://apps.apple.com/in/app/spiritzone/id1521353304" target="_blank">
+                <img src="https://www.spiritzone.in/img/ilstrator/app.svg" alt="">
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.boxwishlabs.spiritzone" target="_blank">
+                <img src="https://www.spiritzone.in/img/ilstrator/play.svg" alt="">
+            </a>
+
+        </div>
+    </div>
+}
+else
+{
+    <h2 style="text-align:center">Record Not found</h2>
+}

@@ -1,0 +1,163 @@
+﻿@model IEnumerable<RainbowWine.Data.RoutePlan>
+@{
+    ViewBag.Title = "Delivery";
+    string urldisplay = "";
+    if (Model.Count() > 0)
+    {
+        urldisplay = Model.ToList()[0].RoutePlanLink.Length <= 50 ? Model.ToList()[0].RoutePlanLink : Model.ToList()[0].RoutePlanLink.Substring(0, 50);
+    }
+    bool NotPacked = Convert.ToBoolean(ViewBag.IsOrderRemainToPacked);
+}
+
+<h2>Delivery</h2>
+@if (NotPacked)
+{
+    <label>There are orders to pack. Please wait, lets packer complete the job.</label>
+}
+else if (Model.Count() <= 0)
+{
+    <label>No Data</label>
+    <p><button id="btnBackToShop2">Stop</button></p>
+
+
+    @section scripts{
+        <script>
+            $('#btnBackToShop2').click(function () {
+                if (confirm('Are you sure do you want to set your status at shop.')) {
+                    $.ajax({
+                        url: "/orders/UpdateDeliveryStatus?userId=@ViewBag.DeliveryUserId",
+                        success: function (data) {
+                            console.log(data);
+                        },
+                        error: function (error) {
+                        }
+                    });
+                }
+                return false;
+            });
+        </script>
+    }
+
+}
+else
+{
+    <p>Delivery Agent Name : @Model.ToList()[0].DeliveryAgent.DeliveryExecName</p>
+    @*<p>Delivery Slot  : @Model.ToList()[0].DeliveryStart to @Model.ToList()[0].DeliveryEnd</p>*@
+    <p>Route Plan  : <a target="_blank" href="@Model.ToList()[Model.Count() - 1].RoutePlanLink">@urldisplay..</a> <button id="btnStart">Start</button> <button id="btnBackToShop">Stop</button></p>
+
+    <table class="table">
+        <tr>
+            <th>
+                Order No
+            </th>
+            <th>
+                Delivery Start
+            </th>
+            <th>
+                Delivery End
+            </th>
+            <th>
+                Customer Contact
+            </th>
+            <th>
+                Customer Address
+            </th>
+            <th>
+                Link
+            </th>
+            <th>
+                Status
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Order.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryEnd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer.ContactNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer.Address) &nbsp;
+                    @Html.DisplayFor(modelItem => item.Customer.Flat) &nbsp;
+                    @Html.DisplayFor(modelItem => item.Customer.Landmark)
+                </td>
+                <td>
+                    <a target="_blank" href="@item.RoutePlanLink">@(item.RoutePlanLink.Length <= 50 ? item.RoutePlanLink : item.RoutePlanLink.Substring(0, 50))..</a>
+                    @*@Html.DisplayFor(modelItem=> item.RoutePlanLink)*@
+                </td>
+                <td>
+                    <a onclick="javascript: processorder('@item.Order.Id'); return false;" style="cursor:pointer;">@item.Order.OrderStatu.OrderStatusName</a>
+                </td>
+            </tr>
+        }
+
+    </table>
+    @section scripts{
+        <script>
+            function processorder(id) {
+                if (confirm('Are you sure do you want order no '+id+' to be make as delivered.')) {
+                     $.ajax({
+                    url: "/orders/DeliveryConfrim",
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        window.location.reload();
+                    },
+                    error: function (error) {
+                    }
+                });
+                }
+                return false;
+            }
+            $('#btnStart').click(function () {
+                if (confirm('Are you sure do you want to send "On the way" delivery message to customers.')) {
+                    $.ajax({
+                        url: "/orders/NoDelivery",
+                        success: function (data) {
+                            console.log(data);
+                        },
+                        error: function (error) {
+                        }
+                    });
+                }
+                return false;
+            });
+            $('#btnBackToShop').click(function () {
+                if (confirm('Are you sure do you want to set your status at shop.')) {
+                    $.ajax({
+                        url: "/orders/UpdateDeliveryStatus?userId=@ViewBag.DeliveryUserId",
+                        success: function (data) {
+                            console.log(data);
+                        },
+                        error: function (error) {
+                        }
+                    });
+                }
+                return false;
+            });
+            $('#btnBackToShop2').click(function () {
+                if (confirm('Are you sure do you want to set your status at shop.')) {
+                    $.ajax({
+                        url: "/orders/UpdateDeliveryStatus?userId=@ViewBag.DeliveryUserId",
+                        success: function (data) {
+                            console.log(data);
+                        },
+                        error: function (error) {
+                        }
+                    });
+                }
+                return false;
+            });
+        </script>
+    }
+}

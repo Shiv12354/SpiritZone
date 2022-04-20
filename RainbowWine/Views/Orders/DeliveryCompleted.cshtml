@@ -1,0 +1,71 @@
+﻿@model IEnumerable<RainbowWine.Data.RoutePlan>
+@{
+    ViewBag.Title = "Delivery Completed";
+    string urldisplay = "";
+    if (Model.Count() > 0)
+    {
+        urldisplay = Model.ToList()[0].RoutePlanLink.Length <= 50 ? Model.ToList()[0].RoutePlanLink : Model.ToList()[0].RoutePlanLink.Substring(0, 50);
+    }
+}
+
+<h2>Delivery</h2>
+@if (Model.Count() <= 0)
+{
+    <label>No Data</label>
+}
+else
+{
+    <p>Delivery Agent Name : @Model.ToList()[0].DeliveryAgent.DeliveryExecName</p>
+    @*<p>Route Plan  : <a target="_blank" href="@Model.ToList()[Model.Count()-1].RoutePlanLink">@urldisplay..</a> <button id="btnStart">Start</button> 
+    <button id="btnBackToShop">Stop</button></p>*@
+
+    <table class="table">
+        <tr>
+            <th>
+                Order No
+            </th>
+            <th>
+                Delivered Date
+            </th>
+            <th>
+                Delivery Start
+            </th>
+            <th>
+                Delivery End
+            </th>
+            <th>
+                Customer Address
+            </th>
+            <th>
+                Status
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Order.Id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Order.DeliveryDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DeliveryStart)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DeliveryEnd)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Customer.Address) &nbsp;
+            @Html.DisplayFor(modelItem => item.Customer.Flat) &nbsp;
+            @Html.DisplayFor(modelItem => item.Customer.Landmark)
+        </td>
+        <td>
+            @item.Order.OrderStatu.OrderStatusName
+        </td>
+    </tr>
+        }
+
+    </table>
+}

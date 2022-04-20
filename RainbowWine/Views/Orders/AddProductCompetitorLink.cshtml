@@ -1,0 +1,106 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.ProductCompetitorLinkDO>
+
+<h2>Add Competitor Product</h2>
+
+
+    <div>
+        <br />
+        <b>Products</b>
+        <select id="NotLinkProductListId" name="NotLinkProductListlist" size="10">
+            @if (ViewBag.NotLinkProductList != null)
+            {
+                foreach (var item in ViewBag.NotLinkProductList)
+                {
+                    if (item.Text != null)
+                    {
+                        <option class="ms-elem-selectable" value="@item.Value">@item.Text</option>
+                    }
+                }
+
+            }
+        </select>
+
+        <b>Competitor Products</b>
+        <select id="competitorlistId" multiple="multiple" required=required name="competitorlist" >
+            @if (ViewBag.AllProductList != null)
+            {
+                foreach (var item in ViewBag.AllProductList)
+                {
+                    if (item.Text != null)
+                    {
+                        <option value="@item.Value">
+                            @item.Text
+                        </option>
+
+                    }
+                }
+            }
+        </select>
+
+    </div>
+    <br />
+ <button id="btnSave" style="align-items:center">Save</button>
+    @section scripts{
+
+        <script>
+
+            $('#btnSave').on('click', function () {
+                var SelectedPId = $("#NotLinkProductListId option:selected");
+                var selected = $("#competitorlistId option:selected");  /*Current Selected Value*/
+                var message = "";
+
+                var arrSelectedPId = [];      /*Array to store multiple values in stack*/
+                SelectedPId.each(function () {
+                    arrSelectedPId.push($(this).val());    /*Stack the Value*/
+                    message += $(this).text() + " " + $(this).val() + "\n";
+
+                });
+
+                var arrSelected = [];      /*Array to store multiple values in stack*/
+                selected.each(function () {
+                    arrSelected.push($(this).val());    /*Stack the Value*/
+                    message += $(this).text() + " " + $(this).val() + "\n";
+
+                });
+
+                if (arrSelectedPId == null || arrSelectedPId == "") {
+                    alert("Please select Product from dropdown");
+                    return false;
+                }
+                if (arrSelected == null || arrSelected == "") {
+                    alert("Please select Competitor Product from dropdown");
+                    return false;
+                }
+                $.post(
+                    '/Orders/AddCompetitorProduct/',
+                    { produtId: arrSelectedPId, competPrudts: arrSelected, action: "NewEntry" },
+                    function (item) {
+                        alert("Competitor Product Added With New Product Successfully");
+                        window.location.reload();
+                    }, "json");
+            });
+
+        </script>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js">
+        </script>
+        <script type="text/javascript">
+            $(function () {
+                $("#NotLinkProductListId").select2({
+                    placeholder: '--Select Product--',
+                    theme: "classic"
+                });
+            });
+
+            $(function () {
+                $("#competitorlistId").select2({
+                    placeholder: '--Select Competitor--',
+                    closeOnSelect: false,
+                    width: '50%',
+                });
+            });
+
+        </script>
+    }

@@ -1,0 +1,206 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<RainbowWine.Services.DO.OrderWiseBreakDownDO>
+@{
+    ViewBag.Title = "OrderWise BreakDown";
+
+}
+<h2>OrderWise BreakDown</h2>
+
+<div>
+    Shops
+    <select id="Shopids" multiple="multiple" required=required name="Shopidslist">
+        @if (ViewBag.shops != null)
+        {
+            foreach (var item in ViewBag.shops)
+            {
+                if (item.Text != null)
+                {
+                    <option value="@item.Value">
+                        @item.Text
+                    </option>
+
+                }
+            }
+        }
+    </select>
+</div>
+<br />
+<div>
+   
+    <div>
+        Date-:<input type="text" id="txtDate" />
+        Month-:<input type="text" id="txtMonth" />
+        Year-:<input type="text" id="txtYear" />
+        <button id="btnSearch" class="display-mode">Search</button>
+        <div style="text-align:right">Grand Total -:<b>@ViewBag.SumOfTotal</b></div>
+    </div>
+</div>
+<br />
+<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+    <thead class="bg-success">
+        <tr>
+            <th>
+                PrepaidOnlinecollectionamount
+            </th>
+            <th>
+                LicPermitAmount
+            </th>
+            <th>
+                WalletAmountUsed
+            </th>
+            <th>
+                PODonlinepaymentamount
+            </th>
+            <th>
+                PODCashPaymentAmount
+            </th>
+            <th>
+                Cashcollectedbyshop
+            </th>
+            <th>
+                CashRefundedbyshop
+            </th>
+            <th>
+                OrderType
+            </th>
+            <th>
+                MixerSales
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                ShopName
+            </th>
+           
+        </tr>
+    </thead>
+
+    @foreach (var item in Model)
+    {
+        <tbody>
+            <tr>
+                <td>
+                    @Html.Label(item.PrepaidOnlinecollectionamount.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.LicPermitAmount.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.WalletAmountUsed.ToString(), new { @class = "display-mode" })
+
+                </td>
+                <td>
+                    @Html.Label(item.PODonlinepaymentamount.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.PODCashPaymentAmount.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.Cashcollectedbyshop.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.CashRefundedbyshop.ToString(), new { @class = "display-mode" })
+
+                </td>
+                <td>
+                    @Html.Label(item.OrderType.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.MixerSales.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.Total.ToString(), new { @class = "display-mode" })
+
+                </td>
+                <td>
+                    @Html.Label(item.ShopName.ToString(), new { @class = "display-mode" })
+                </td>
+
+            </tr>
+        </tbody>
+    }
+
+</table>
+<div id='Paging' style="text-align:center">
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model, page => Url.Action("OrderWiseBreakDown", new { page }))
+
+</div>
+@section scripts{
+    <script src="~/Scripts/jquery.timepicker.min.js"></script>
+    <link href="~/Scripts/jquery.timepicker.min.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#txtDate').datepicker();
+            $('#txtDate').datepicker('setDate', 'today');
+            $('#txtMonth').datepicker({
+                dateFormat: 'mm'
+            });
+            $('#txtYear').datepicker({
+                dateFormat: 'yy'
+            });
+            $("#inputID").prop('disabled', true); //disable 
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $('#btnSearch').click(function () {
+            var selected = $("#Shopids option:selected");    /*Current Selected Value*/
+            var message = "";
+            var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                arrSelected.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+
+            });
+            var date = $('#txtDate').val();
+            var month = $('#txtMonth').val();
+            var year = $('#txtYear').val();
+            window.location = "/orders/OrderWiseBreakDown?shopids=" + arrSelected + "&date=" + date + "&month=" + month + "&year=" + year;
+
+        });
+    </script>
+    <script language="javascript">
+
+        $(function () {
+            $("#Shopids").select2({
+                placeholder: '--Select Shops--',
+                closeOnSelect: false,
+                width: '90%',
+            });
+        });
+        $('#txtDate').change(function () {
+            $("#txtMonth").val('');
+            $("#txtYear").val('');
+            $("#txtMonth").prop('disabled', true); //disable 
+            $("#txtYear").prop('disabled', true); //disable 
+        });
+        $('#txtMonth').change(function () {
+            $("#txtDate").val('');
+            $("#txtDate").prop('disabled', true); //disable
+        });
+        $('#txtYear').change(function () {
+            $("#txtDate").val('');
+            $("#txtDate").prop('disabled', true); //disable
+        });
+
+
+    </script>
+    <script language="javascript">
+        $(function () {
+            $('#choose').pagination({
+                items: 20,
+                itemsOnPage: 2,
+                cssStyle: 'light-theme',
+                onPageClick: function (pageNumber) { test(pageNumber) }
+            });
+        });
+
+    </script>
+
+}
+

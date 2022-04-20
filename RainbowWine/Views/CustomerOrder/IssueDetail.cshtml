@@ -1,0 +1,1522 @@
+﻿@model RainbowWine.Data.OrderIssue
+@using RainbowWine.Services.DO
+@using RainbowWine.Data
+@{ ViewBag.Title = "IssueOrdersDetail";
+    var origOrder = ViewBag.OrderOriginal as List<OrderIssueDetailOriginal>;
+    var origMixerOrder = ViewBag.MixerOrderOriginal as List<MixerIssueDetailOriginal>;
+    var origGiftrOrder = ViewBag.OriginalGiftBagOrder as List<GiftBagOrderItemIssueDetailOriginal>;
+    var allTypeRefund = ViewBag.AllTypeRefund as List<AllTypeRefundDetailsDO>;
+    double permitAmt = Convert.ToDouble(5);
+    //permitAmt = (Model == null) ? 0 : (Model.Order == null) ? 0 : string.IsNullOrWhiteSpace(Model.Order.LicPermitNo) ? permitAmt : 0;
+    double totalAmt = 0;//premit amount
+    double origTotal = 0;
+    double origOrderTotal = 0;
+    double origMixerTotal = 0;
+    double origGiftTotal = 0;
+    bool isChanged = Convert.ToBoolean(ViewBag.IsChanges);
+    bool isPodOrder = Convert.ToBoolean(ViewBag.IsPodOrder);
+    string OrderIssueTypePay = Convert.ToString(ViewBag.OrderIssueTypePay);
+    double ammt = 0;
+    double walletammt = 0;
+    if (Model != null && Model.Order != null)
+    {
+        if (Model.Order.WalletAmountUsed != null)
+        {
+            walletammt = Convert.ToDouble(Model.Order.WalletAmountUsed.Value);
+            ammt = Convert.ToDouble(Model.Order.OrderAmount) - Convert.ToDouble(Model.Order.WalletAmountUsed.Value);
+        }
+        else
+        {
+            ammt = Convert.ToDouble(Model.Order.OrderAmount);
+        }
+
+        if (Model.Order.OrderType == "m") { permitAmt = string.IsNullOrWhiteSpace(Model.Order.LicPermitNo) ? permitAmt : 0; }
+        else { permitAmt = 0; }
+    } }
+<head>
+    <style>
+        .dd{
+            padding-left: 20px;
+        }
+    </style>
+</head>
+@if (ViewBag.MessageCall != null)
+{
+<script type="text/javascript">
+
+            window.onload = function () {
+                alert("@ViewBag.MessageCall");
+                window.location.reload();
+            };
+</script> }
+            else
+            {
+<h2>Issue Orders Detail</h2>
+
+                <p>
+                </p>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <dl class="dl-horizontal">
+                                          
+                                            <dt>
+                                                Issue ID:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.OrderIssueId)
+                                            </dd>
+                                            <dt>
+                                                Order ID:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.OrderId)
+                                            </dd>
+                                            <dt>
+                                                Customer Name:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.Order.Customer.CustomerName)
+                                            </dd>
+
+                                            <dt>
+                                                Shop Name:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.Order.WineShop.ShopName)
+                                            </dd>
+                                            <dt>
+                                                Shop number:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.Order.WineShop.ShopPhoneNo)
+                                            </dd>
+                                            <dt>
+                                                Order Placed at:
+                                            </dt>
+                                            <dd>
+                                                @{ if (Model.Order.OrderType == "m")
+                                                    {
+                                    <span>Mobile</span> }
+                                else
+                                {
+                                    <span>Web</span> } }
+                                            </dd>
+                                            <dt>
+                                                Online Payment:
+                                            </dt>
+                                            <dd>
+                                                @ammt
+
+                                            </dd>
+                                            <dt>
+                                                Wallet Used Amount:
+                                            </dt>
+                                            <dd>
+                                                @walletammt
+                                            </dd>
+
+                                            <dt>
+                                                Gift Order:
+                                            </dt>
+                                            <dd>
+                                                @if (Model.Order.IsGift == true)
+                                                {
+                                    <div>Yes</div> }
+                                else
+                                {
+                                    <div>No</div>}
+                                            </dd>
+
+                                            <dt>
+                                                Call
+                                            </dt>
+                                            <dd>
+                                                @Html.ActionLink("Call", "CallOptionOrderIssue", "Orders", new { id = Model.OrderId, issueId = Model.OrderIssueId }, new { onclick = $"return confirm('Do you want to connect to this customer? You will be connecting via this extension: {ViewBag.InterUserContNo}');" })
+                                            </dd>
+                                           
+                                             <dt class="dt1">
+                                                        Online Payment:
+                                                    </dt>
+                                                   
+                                             @foreach (var refunds in allTypeRefund.Where(x => x.Refund == "OnlineRefund"))
+                                                        {
+
+                                                            if (@refunds.Refund == "OnlineRefund")
+                                                            {
+                                    <dd class="dd1">
+                                        <dl>
+                                            <dt>Status</dt>
+                                            <dd>@refunds.Refund</dd>
+                                            <dt>Amount</dt>
+                                            <dd>@refunds.Amount</dd>
+                                            <dt>ProcessedDate</dt>
+                                            <dd>@refunds.ProcessedDate</dd>
+                                            <dt>ARN Number</dt>
+                                            <dd>@refunds.ARNNumber</dd>
+                                        </dl>
+                                    </dd>}
+                                                    }
+
+                                                    <dt class="dt2">
+                                                        Wallet Refund:
+                                                    </dt>
+                                                    
+                                                        @foreach (var wrefunds in allTypeRefund.Where(x => x.Refund == "WalletRefund"))
+                                                        {
+                                                            if (@wrefunds.Refund == "WalletRefund")
+                                                            {
+                                    <dd class="dd2">
+                                        <dl>
+                                            <dt>Status</dt>
+                                            <dd>@wrefunds.Refund</dd>
+                                            <dt>Amount</dt>
+                                            <dd>@wrefunds.Amount</dd>
+                                            <dt>Date</dt>
+                                            <dd>@wrefunds.CreatedDate</dd>
+                                        </dl>
+                                    </dd>
+}
+                            }
+
+                                           
+                                                        <dt class="dt3">
+                                                            Cash Refund:
+                                                        </dt>
+                                                       
+                                                            @foreach (var crefunds in allTypeRefund.Where(x => x.Refund == "CashRefund"))
+                                                            {
+                                                                if (@crefunds.Refund == "CashRefund")
+                                                                {
+                                        <dd class="dd3">
+                                            <dl>
+                                                <dt>Status</dt>
+                                                <dd>@crefunds.Refund</dd>
+                                                <dt>Amount</dt>
+                                                <dd>@crefunds.Amount</dd>
+                                                <dt>Date</dt>
+                                                <dd>@crefunds.CreatedDate</dd>
+                                            </dl>
+                                        </dd>
+}
+                                }
+                                                       
+                                           
+                                            </dl>
+                                                </div>
+
+                                    <div class="col-md-4">
+                                        <dl class="dl-horizontal">
+                                            <dt>
+                                                Issue date:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.CreatedDate)
+                                            </dd>
+                                            <dt>
+                                                Order Date:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.Order.OrderDate)
+                                            </dd>
+                                            <dt>
+                                                Discount %:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.Order.DiscountUnit)
+                                            </dd>
+                                            <dt>
+                                                Discount Amt:
+                                            </dt>
+                                            <dd>
+                                                @Html.DisplayFor(model => model.Order.DiscountAmount)
+                                            </dd>
+                                        </dl>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p>
+                                            @if ((ViewBag.UserType == "Shopper") && (Model.OrderStatusId == 6 && (Model.OrderIssueTypeId == 10 || Model.OrderIssueTypeId == 11)))
+                                            {
+                            <button id="btnRevertAmount">Revert Amount </button> }
+
+                        else if ((ViewBag.UserType == "Shopper") && (Model.OrderStatusId == 6 || Model.OrderStatusId == 12) && (Model.Order.OrderStatusId == 3 || Model.Order.OrderStatusId == 68))
+                        {
+
+                        }
+                        else if ((ViewBag.UserType == "Shopper") && (Model.OrderStatusId != 6 && (Model.OrderIssueTypeId != 3 && Model.OrderIssueTypeId != 10 && Model.OrderIssueTypeId != 11 && Model.OrderIssueTypeId != 12)))
+                        {
+        <button id="ApproveIssue">Approve</button> }
+    else
+    {
+        if (!isPodOrder)
+        {
+<button id="btnRefund">Full Refund</button>
+                        <button id="btnWalletRefund">Wallet Full Refund</button>
+                                                <button id="btnPartialRefund">Partial Refund</button>
+                                                                        <button id="btnWalletPartialRefund">Wallet Partial Refund</button>
+                                                                                                <button id="btnPayment">Partial Payment</button>
+                                                                                                                        <button id="btnCashPayment">Cash Payment</button>
+                                                                                                                                                <button id="btnCashRefund">Cash Refund</button> }
+                                                                                                                        <button id="btnClose">Close</button> if (isPodOrder)
+                                                                                                                        {
+                                                                                                    <button id="btnCancel">Cancel</button>
+                                                                                                                            <button id="btnSave">Save POD</button> }
+                                                                                                                        else if (isChanged)
+                                                                                                                        {
+                                                                                                    <button id="btnSaveChanged">Save</button>}
+                                                                                            }
+                                        </p>
+                                        @Html.DropDownListFor(model => model.OrderIssueTypeId, (IEnumerable<SelectListItem>)@ViewBag.IssueType, htmlAttributes: new { @class = "form-control", @id = "dpIssueType", @style = "display:none" })
+                                        @Html.TextArea("txtRemark", new { @cols = "40", @rows = "4", @placeholder = "Provide your remarks/comments." })
+                                    </div>
+                                </div> if (!string.IsNullOrWhiteSpace(OrderIssueTypePay))
+                                {
+                <div class="row">
+                    <div style="color:red;"><b>This issue is @OrderIssueTypePay</b> </div>
+                </div> } @*@if (origOrder != null && origOrder.Count > 0 && ViewBag.UserType == "Shopper")
+                {*@
+                                <h3>Original Order List</h3>
+                                                <div class="row">
+                                                    <table class="table">
+                                                        <tr>
+                                                            <th>
+                                                                Product Name
+                                                            </th>
+                                                            <th>
+                                                                Price
+                                                            </th>
+                                                            <th>
+                                                                QTY
+                                                            </th>
+                                                            <th>
+                                                                Amount
+                                                            </th>
+                                                            <th></th>
+                                                        </tr>
+
+                                                        @{ foreach (var item1 in origOrder)
+                                                            {
+                                                                double itemAmt = Convert.ToDouble(item1.Price) * (item1.ItemQty ?? 0);
+
+                                                                origOrderTotal = origOrderTotal + itemAmt;
+
+                                            <tr style='@((item1.Issue == true) ? "color:red;" : "")'>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item1.ProductDetail.ProductName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item1.Price)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item1.ItemQty)
+                                                </td>
+                                                <td>
+                                                    @itemAmt
+                                                </td>
+                                                <td>
+                                                </td>
+                                            </tr>
+ } }
+
+                                                    </table>
+                                                </div> if (Model.Order.MixerOrderItems?.Count > 0)
+                                                {
+                                <h3>Original Mixer List</h3>
+                                                    <div class="row">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <th>
+                                                                    Product Name
+                                                                </th>
+                                                                <th>
+                                                                    Price
+                                                                </th>
+                                                                <th>
+                                                                    QTY
+                                                                </th>
+                                                                <th>
+                                                                    Amount
+                                                                </th>
+                                                                <th></th>
+                                                            </tr>
+
+                                                            @{ foreach (var itemMixer in origMixerOrder)
+                                                                {
+                                                                    decimal? itemMixerAmt = (itemMixer.Price) * (itemMixer.ItemQty ?? 0);
+                                                                    origMixerTotal = origMixerTotal + Convert.ToDouble(itemMixerAmt);
+
+                                            <tr style='@((itemMixer.Issue == true) ? "color:red;" : "")'>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => itemMixer.MixerDetail.Mixer.MixerName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => itemMixer.Price)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => itemMixer.ItemQty)
+                                                </td>
+                                                <td>
+                                                    @itemMixerAmt
+                                                </td>
+                                                <td>
+                                                </td>
+                                            </tr>
+ } }
+
+                                                        </table>
+                                                    </div>}
+                                                if (Model.Order.GiftBagOrderItems?.Count > 0)
+                                                {
+                                <h3>Original Gift List</h3>
+                                                    <div class="row">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <th>
+                                                                    Product Name
+                                                                </th>
+                                                                <th>
+                                                                    Price
+                                                                </th>
+                                                                <th>
+                                                                    QTY
+                                                                </th>
+                                                                <th>
+                                                                    Amount
+                                                                </th>
+                                                                <th></th>
+                                                            </tr>
+
+                                                            @{ foreach (var itemGift in origGiftrOrder)
+                                                                {
+                                                                    decimal? itemGiftAmt = (itemGift.Price) * (itemGift.ItemQty ?? 0);
+                                                                    origMixerTotal = origMixerTotal + Convert.ToDouble(itemGiftAmt);
+
+                                            <tr style='@((itemGift.Issue == true) ? "color:red;" : "")'>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => itemGift.GiftBagName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => itemGift.Price)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => itemGift.ItemQty)
+                                                </td>
+                                                <td>
+                                                    @itemGiftAmt
+                                                </td>
+                                                <td>
+                                                </td>
+                                            </tr>
+ } }
+
+                                                        </table>
+                                                    </div> } @*}*@ { origTotal = origOrderTotal + origMixerTotal; }
+                                    <h3>Order List</h3>
+                                                    <div class="row">
+                                                        <div>
+                                                            @{ var grid = new WebGrid(Model.OrderIssueDetails, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+                                                                grid.Pager(WebGridPagerModes.FirstLast);
+
+                                                @grid.GetHtml(tableStyle: "table",
+                                                                                                headerStyle: "",
+                                                                                                alternatingRowStyle: "alt",
+                                                                                                selectedRowStyle: "select",
+                                                                                                htmlAttributes: new { @id = "WebGrid" },
+                                                                                                columns: grid.Columns(
+                                                                               grid.Column("Issue",
+                                                                               format:@<text>
+                                                                                @Html.Label(((bool)Convert.ToBoolean(item.Issue)).ToString(), new { @class = "normal-mode" })
+                                                                            </text>),
+grid.Column("ShopId",
+format: @<text>
+    @Html.Label(((int)item.ShopID).ToString(), new { @class = "normal-mode" })
+</text>),
+grid.Column("ODetailId",
+format: item => (item.OrderDetailId == null) ? "" : ((int)item.OrderDetailId).ToString()
+),
+grid.Column("Id",
+format:@<text>
+    @Html.ActionLink(((int)item.OrderIssueDetailId).ToString(), "Edit", new { id = item.OrderIssueDetailId })
+</text>),
+grid.Column("Product Name",
+format:@<text>
+    @Html.Label((string)item.ProductDetail.ProductName, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Price",
+format:@<text>
+    @Html.Label(((double)item.Price).ToString(), new { @class = "normal-mode", @id = "ItemPrice" })
+</text>
+),
+grid.Column("Qty",
+format:@<text>
+    @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "ItemQty" })
+    @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+
+</text>
+),
+grid.Column("Amt",
+format:@<text>
+    @{ int q = ((int)item.ItemQty);
+double p = ((double)item.Price);
+double amt = p * q;
+totalAmt = totalAmt + amt; }
+    @Html.Label(((int)amt).ToString(), new { @class = "normal-mode", @id = "ItemAmt" })
+</text>
+),
+grid.Column("",
+style: "col1",
+format: @<text><div style="padding-left:20px;">
+        <button class="btn btn-default edit-item display-mode " id="@item.OrderIssueDetailId">Edit</button>
+        <button class="btn btn-default display-mode delete-item" id="@item.OrderIssueDetailId">Delete</button>
+        <button class="btn btn-default save-item edit-mode" id="@item.OrderIssueDetailId">Save</button>
+        <button class="btn btn-default cancel-item edit-mode" id="@item.OrderIssueDetailId">Cancel</button>
+    </div>
+</text>)
+)
+) }
+                                                        </div>
+                                                        <div>
+                                                            <h3>Mixer List</h3>
+
+                                                            @{ var grid1 = new WebGrid(Model.MixerIssueDetails, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+                                                                grid1.Pager(WebGridPagerModes.FirstLast);
+
+                                                @grid1.GetHtml(tableStyle: "table",
+                                                                                                headerStyle: "",
+                                                                                                alternatingRowStyle: "alt",
+                                                                                                selectedRowStyle: "select",
+                                                                                                htmlAttributes: new { @id = "WebGrid" },
+                                                                                                columns: grid.Columns(
+                                                                               grid1.Column("Issue",
+                                                                               format:@<text>
+                                                                                @Html.Label(((bool)Convert.ToBoolean(item.Issue)).ToString(), new { @class = "normal-mode" })
+                                                                            </text>),
+grid1.Column("ShopId",
+format: @<text>
+    @Html.Label(((int)item.ShopID).ToString(), new { @class = "normal-mode" })
+</text>),
+grid1.Column("ODetailId",
+format: item => (item.OrderDetailId == null) ? "" : ((int)item.OrderDetailId).ToString()
+),
+grid1.Column("Id",
+format:@<text>
+    @Html.ActionLink(((int)item.MixerIssueDetailId).ToString(), "Edit", new { id = item.MixerIssueDetailId })
+</text>),
+grid1.Column("Product Name",
+format:@<text>
+    @Html.Label((string)item.MixerDetail.Mixer.MixerName, new { @class = "normal-mode" })
+</text>
+),
+grid1.Column("Price",
+format:@<text>
+    @Html.Label(((double)item.Price).ToString(), new { @class = "normal-mode", @id = "ItemPrice" })
+</text>
+),
+grid1.Column("Qty",
+format:@<text>
+    @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "ItemQty" })
+    @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+
+</text>
+),
+grid1.Column("Amt",
+format:@<text>
+    @{ int q = ((int)item.ItemQty);
+double p = ((double)item.Price);
+double amt = p * q;
+totalAmt = totalAmt + amt; }
+    @Html.Label(((int)amt).ToString(), new { @class = "normal-mode", @id = "ItemAmt" })
+</text>
+),
+grid1.Column("",
+style: "col1",
+format: @<text><div style="padding-left:20px;">
+        <button class="btn btn-default edit-item display-mode " id="@item.MixerIssueDetailId">Edit</button>
+        <button class="btn btn-default display-mode delete-item" id="@item.MixerIssueDetailId">Delete</button>
+        <button class="btn btn-default save-item edit-mode" id="@item.MixerIssueDetailId">Save</button>
+        <button class="btn btn-default cancel-item edit-mode" id="@item.MixerIssueDetailId">Cancel</button>
+    </div>
+</text>)
+)
+) }
+                                                        </div>
+                                                        <div>
+                                                            <h3>Gift List</h3>
+
+                                                            @{ var grid2 = new WebGrid(Model.GiftBagOrderItemIssueDetails, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+                                                                grid2.Pager(WebGridPagerModes.FirstLast);
+
+                                                @grid2.GetHtml(tableStyle: "table",
+                                                                                                 headerStyle: "",
+                                                                                                 alternatingRowStyle: "alt",
+                                                                                                 selectedRowStyle: "select",
+                                                                                                 htmlAttributes: new { @id = "WebGrid" },
+                                                                                                 columns: grid.Columns(
+                                                                                grid2.Column("Issue",
+                                                                                format:@<text>
+                                                                                    @Html.Label(((bool)Convert.ToBoolean(item.Issue)).ToString(), new { @class = "normal-mode" })
+                                                                                </text>),
+grid2.Column("ShopId",
+format: @<text>
+    @Html.Label(((int)item.ShopID).ToString(), new { @class = "normal-mode" })
+</text>),
+grid2.Column("ODetailId",
+format: item => (item.OrderDetailId == null) ? "" : ((int)item.OrderDetailId).ToString()
+),
+grid2.Column("Id",
+format:@<text>
+    @Html.ActionLink(((int)item.GiftBagIssueDetailId).ToString(), "Edit", new { id = item.GiftBagIssueDetailId })
+</text>),
+grid2.Column("Product Name",
+format:@<text>
+    @Html.Label((string)item.GiftBagName, new { @class = "normal-mode" })
+</text>
+),
+grid2.Column("Price",
+format:@<text>
+    @Html.Label(((double)item.Price).ToString(), new { @class = "normal-mode", @id = "ItemPrice" })
+</text>
+),
+grid2.Column("Qty",
+format:@<text>
+    @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "ItemQty" })
+    @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+
+</text>
+),
+grid2.Column("Amt",
+format:@<text>
+    @{ int q = ((int)item.ItemQty);
+double p = ((double)item.Price);
+double amt = p * q;
+totalAmt = totalAmt + amt; }
+    @Html.Label(((int)amt).ToString(), new { @class = "normal-mode", @id = "ItemAmt" })
+</text>
+),
+grid2.Column("",
+style: "col1",
+format: @<text><div style="padding-left:20px;">
+        <button class="btn btn-default edit-item display-mode " id="@item.GiftBagIssueDetailId">Edit</button>
+        <button class="btn btn-default display-mode delete-item" id="@item.GiftBagIssueDetailId">Delete</button>
+        <button class="btn btn-default save-item edit-mode" id="@item.GiftBagIssueDetailId">Save</button>
+        <button class="btn btn-default cancel-item edit-mode" id="@item.GiftBagIssueDetailId">Cancel</button>
+    </div>
+</text>)
+)
+) }
+                                                        </div>
+
+                                                        <table border="0" cellpadding="0" cellspacing="0">
+                                                            <tr>
+                                                                <td style="width: 150px">
+                                                                    Product Name:<br />
+                                                                    <input type="text" id="txtProductName-Add" style="width:140px" />
+                                                                    <input type="hidden" id="txtProductId-Add" style="width:140px" />
+                                                                    <input type="hidden" id="txtIsMixer-Add" style="width:140px" />
+                                                                    <input type="hidden" id="txtIsGift-Add" style="width:140px" />
+                                                                </td>
+                                                                <td style="width: 150px">
+                                                                    Price:<br />
+                                                                    <input type="text" id="txtPrice-Add" style="width:140px" />
+                                                                </td>
+                                                                <td style="width: 150px">
+                                                                    Qty:<br />
+                                                                    <input type="text" id="txtQty-Add" pattern="[0-9]*" inputmode="numeric" style="width:140px" />
+                                                                </td>
+                                                                <td style="width: 150px">
+                                                                    Amt:<br />
+                                                                    <input type="text" id="txtAmt-Add" style="width:140px" />
+                                                                </td>
+                                                                <td style="width: 100px">
+                                                                    <br />
+                                                                    <input type="button" id="btnAdd" value="Add" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+
+                                                    </div>
+                                                                    <div class="row">
+                                                                        <div><input type="hidden" id="txtProductQtyAvail"></div>
+                                                                        <div class="alert-info" id="prodinfomsg"></div>
+                                                                        <div class="alert-info" id="validitemmsg"></div>
+                                                                        <div><strong>Lic Permit Amount :</strong> @permitAmt</div>
+                                                                        <div><strong>Dicount %:</strong> @Model.Order.DiscountUnit</div>
+
+                                                                        @{ var dis = Convert.ToDouble(Model.Order.DiscountUnit);
+                                                                            if (dis > 0)
+                                                                            {
+
+                                                                                totalAmt = Math.Round(totalAmt - ((dis / 100) * totalAmt));
+                                                                                origTotal = Math.Round(origTotal - ((dis / 100) * origTotal));
+                                                                            } }
+                                                                        <div>
+                                                                            <strong>Total Amount :</strong> @origTotal
+                                                                        </div>
+                                                                        <div><strong>Update Total Amount :</strong> <input type="text" id="calTotalAmt" disabled value="@totalAmt"></div>
+                                                                        @{ var diffTotal = totalAmt - origTotal;
+                                                                            if (totalAmt == 0 && Model.Order.OrderType == "m") { diffTotal -= permitAmt; } }
+                                                                        <div>
+                                                                            <strong>Difference in Total Amount :</strong> <input type="text" disabled id="difTotalAmt" value="@(diffTotal)">
+
+                                                                        </div>
+                                                                    </div>
+
+                                                                                    <div id="wait" style="display:none;width:69px;height:89px;border:1px solid black;position:absolute;top:50%;left:50%;padding:2px;"><img src='~/Content/images/loader.gif' width="64" height="64" /><br>Loading..</div>
+
+                                                                                                    @section scripts{
+                                                                                                        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+                                                                                                        <script>
+        loadProductToArray();
+        function loadProductToArray() {
+            var diffAmt = $('#difTotalAmt').val();
+            var calTotalAmt = $('#calTotalAmt').val();
+            var btnPayment = $('#btnPayment');
+            var btnRefund = $('#btnRefund');
+            var btnPartialRefund = $('#btnPartialRefund');
+            var btnWalletRefund = $('#btnWalletRefund');
+            var btnWalletPartialRefund = $('#btnWalletPartialRefund');
+            var dpIssueType = $("#dpIssueType");
+
+            var btnCashPayment = $('#btnCashPayment');
+            var btnCashRefund = $('#btnCashRefund');
+
+            btnPayment.prop('disabled', true);
+            btnRefund.prop('disabled', true);
+            btnPartialRefund.prop('disabled', true);
+            btnWalletRefund.prop('disabled', true);
+            btnWalletPartialRefund.prop('disabled', true);
+
+            btnPayment.prop('style', 'display:none');
+            btnRefund.prop('style', 'display:none');
+            btnPartialRefund.prop('style', 'display:none');
+            btnWalletRefund.prop('style', 'display:none');
+            btnWalletPartialRefund.prop('style', 'display:none');
+
+            btnCashPayment.prop('disabled', true);
+            btnCashRefund.prop('disabled', true);
+            btnCashPayment.prop('style', 'display:none');
+            btnCashRefund.prop('style', 'display:none');
+
+            //if (diffAmt < 0 && Math.abs(diffAmt) == @Model.TotalAmt) {
+            if (calTotalAmt == 0 && Math.abs(diffAmt) == @Model.TotalAmt) {
+                btnPayment.prop('disabled', true);
+                btnRefund.prop('disabled', false);
+                btnPartialRefund.prop('disabled', true);
+                btnWalletRefund.prop('disabled', false);
+                btnWalletPartialRefund.prop('disabled', true);
+
+                btnPayment.prop('style', 'display:none');
+                btnRefund.prop('style', 'display:block');
+                btnWalletRefund.prop('style', 'display:block');
+                btnPartialRefund.prop('style', 'display:none');
+                btnWalletPartialRefund.prop('style', 'display:none');
+                selectByText('FullRefund');
+
+
+
+                btnCashPayment.prop('disabled', true);
+                btnCashRefund.prop('disabled', true);
+                btnCashPayment.prop('style', 'display:none');
+                btnCashRefund.prop('style', 'display:none');
+
+            }
+            else if (diffAmt < 0) {
+                btnPayment.prop('disabled', true);
+                btnRefund.prop('disabled', true);
+                btnWalletRefund.prop('disabled', true);
+                btnPartialRefund.prop('disabled', false);
+                btnWalletPartialRefund.prop('disabled', false);
+
+                btnPayment.prop('style', 'display:none');
+                btnRefund.prop('style', 'display:none');
+                btnWalletRefund.prop('style', 'display:none');
+                btnPartialRefund.prop('style', 'display:block');
+                btnWalletPartialRefund.prop('style', 'display:block');
+                selectByText('PartialRefund');
+
+
+
+                btnCashPayment.prop('disabled', true);
+                btnCashRefund.prop('disabled', false);
+                btnCashPayment.prop('style', 'display:none');
+                btnCashRefund.prop('style', 'display:block');
+            }
+            else if (diffAmt > 0) {
+                btnPayment.prop('disabled', false);
+                btnRefund.prop('disabled', true);
+                btnPartialRefund.prop('disabled', true);
+                btnWalletRefund.prop('disabled', true);
+                btnWalletPartialRefund.prop('disabled', true);
+
+                btnPayment.prop('style', 'display:block');
+                btnRefund.prop('style', 'display:none');
+                btnPartialRefund.prop('style', 'display:none');
+                btnWalletRefund.prop('style', 'display:none');
+                btnWalletPartialRefund.prop('style', 'display:none');
+                selectByText('PartialPay');
+
+                btnCashPayment.prop('disabled', false);
+                btnCashRefund.prop('disabled', true);
+                btnCashPayment.prop('style', 'display:block');
+                btnCashRefund.prop('style', 'display:none');
+            }
+            if (@Model.OrderStatusId==6) {
+
+                btnPartialRefund.prop('disabled', true);
+                btnPartialRefund.prop('style', 'display:none');
+
+                btnWalletPartialRefund.prop('disabled', true);
+                btnWalletPartialRefund.prop('style', 'display:none');
+
+                btnWalletRefund.prop('disabled', true);
+                btnWalletRefund.prop('style', 'display:none');
+
+                btnRefund.prop('disabled', true);
+                btnRefund.prop('style', 'display:none');
+
+                btnCashRefund.prop('disabled', true);
+                btnCashRefund.prop('style', 'display:none');
+
+                btnPayment.prop('disabled', true);
+                btnPayment.prop('style', 'display:none');
+
+                btnCashPayment.prop('disabled', true);
+                btnCashPayment.prop('style', 'display:none');
+
+            }
+
+            if (@Model.Order.OrderStatusId== 3 && @Model.OrderIssueTypeId== 2) {
+                btnPayment.prop('disabled', true);
+                btnPayment.prop('style', 'display:none');
+
+                btnCashPayment.prop('disabled', true);
+                btnCashPayment.prop('style', 'display:none');
+
+            }
+
+             if (@Model.OrderStatusId== 7 && @Model.OrderIssueTypeId== 4) {
+                 btnWalletRefund.prop('disabled', true);
+                 btnWalletRefund.prop('style', 'display:none');
+
+                 btnRefund.prop('disabled', true);
+                 btnRefund.prop('style', 'display:none');
+            }
+
+             if (@Model.Order.OrderAmount == (@Model.Order.WalletAmountUsed + @permitAmt)) {
+                 btnPartialRefund.prop('disabled', true);
+                 btnPartialRefund.prop('style', 'display:none');
+
+                 btnRefund.prop('disabled', true);
+                 btnRefund.prop('style', 'display:none');
+            }
+
+        }
+
+        function selectByText(txt) {
+            $('#dpIssueType option')
+                .filter(function () { return $.trim($(this).text()) == txt; })
+                .attr('selected', true);
+        }
+
+        function selectByValues(txt) {
+
+            $("#dpIssueType").val(txt).attr("selected", "selected");
+
+        }
+
+        $("#txtProductName-Add").autocomplete({
+            source: function (request, response) {
+                 var dpShopId = '@Model.Order.ShopID';
+                $.ajax({
+                    url: "/orders/SearchProductWithMixer",
+                    data: {
+                        text: request.term, shopId: dpShopId
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            //console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id, price: item.price ,IsMixer: item.IsMixer ,IsGift :item.IsGift };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+               //$('#productprice').attr('value', ui.item.price);
+                //$('#OrdDetail_ProductID').attr('value', pid);
+                var pid = ui.item.Id;
+
+                $("#txtPrice-Add").val(ui.item.price);
+                $("#txtProductId-Add").val(pid);
+                $("#txtIsMixer-Add").val(ui.item.IsMixer);
+                $("#txtIsGift-Add").val(ui.item.IsGift);
+
+                var dpShopId = '@Model.Order.ShopID';
+                if (ui.item.IsGift == 1) {
+                    $.ajax({
+                        url: "/orders/SearchGiftBagSelection",
+                        data: {
+                            giftBagDetailId: pid, shopId: dpShopId
+                        },
+                        success: function (data) {
+                            $('#txtProductQtyAvail').attr('value', data.qty);
+                            $('#prodinfomsg').html(data.msg);
+                            $('#txtQty-Add').val('0');
+                            $('#txtAmt-Add').val('');
+                            ValidateQtyItem($('#txtProductQtyAvail').val(), $('#txtQty-Add').val());
+                        }
+                    });
+                }
+               else if (ui.item.IsMixer == 1) {
+                    $.ajax({
+                        url: "/orders/SearchMixerSelection",
+                        data: {
+                            mixerId: pid, shopId: dpShopId
+                        },
+                        success: function (data) {
+                            $('#txtProductQtyAvail').attr('value', data.qty);
+                            $('#prodinfomsg').html(data.msg);
+                            $('#txtQty-Add').val('0');
+                            $('#txtAmt-Add').val('');
+                            ValidateQtyItem($('#txtProductQtyAvail').val(), $('#txtQty-Add').val());
+                        }
+                    });
+                }
+                else {
+
+                    $.ajax({
+                        url: "/orders/SearchProductSelection",
+                        data: {
+                            productId: pid, shopId: dpShopId
+                        },
+                        success: function (data) {
+                            $('#txtProductQtyAvail').attr('value', data.qty);
+                            $('#prodinfomsg').html(data.msg);
+                            $('#txtQty-Add').val('0');
+                            $('#txtAmt-Add').val('');
+                            ValidateQtyItem($('#txtProductQtyAvail').val(), $('#txtQty-Add').val());
+                        }
+                    });
+                }
+            }
+        });
+
+        $('#txtQty-Add').change(function () {
+            ValidateQtyItem($('#txtProductQtyAvail').val(), $(this).val());
+        });
+        function ValidateQtyItem(qty, item) {
+            var qtyvalue = parseInt(qty)
+            var itemvalue = parseInt(item);
+            if (qtyvalue == undefined || qtyvalue == NaN) qtyvalue = 0;
+            if (itemvalue == undefined || item == NaN) itemvalue = 0;
+            console.log(qty + "< " + item)
+            if (!isNaN(itemvalue)) {
+                //if (itemvalue <= 0) {
+                //    $('#btnItemSubmit').attr("disabled", true);
+                //}
+                //else
+                if (qtyvalue < itemvalue) {
+                    $('#validitemmsg').html('\n Selected qty should not be greater than available qty.');
+                    //$('#btnItemSubmit').attr("disabled", true);
+                }
+                else {
+                    $('#validitemmsg').html('');
+                    //$('#btnItemSubmit').attr("disabled", false);
+                }
+            }
+        }
+
+        $("#ApproveIssue").click(function () {
+            var isseType = $("#dpIssueType").val();
+            Approve(isseType);
+        });
+        $("#SaveIssue").click(function () {
+            ForRefund();
+        });
+        $("#btnRefund").click(function () {
+            ForRefund();
+        });
+        $("#btnWalletRefund").click(function () {
+            selectByValues(10);
+
+            ForWalletRefund();
+        });
+        $("#btnPartialRefund").click(function () {
+            ForRefund();
+        });
+        $("#btnWalletPartialRefund").click(function () {
+            selectByValues(11);
+            ForWalletRefund();
+        });
+        $("#btnRevertAmount").click(function () {
+            ForRevertWalletRefundAmount();
+        });
+        $("#btnPayment").click(function () {
+
+            var isseType = $("#dpIssueType option").filter(function () { return $(this).html() == "PartialPay"; }).val();
+            //alert(isseType);
+            if (isseType == undefined || isseType == 0) {
+                alert('IssueType is not set to PartialPay.');
+                return;
+            }
+
+            Approve(isseType);
+
+        });
+        $("#btnCancel").click(function () {
+            CancelOrder();
+        });
+        $("#btnClose").click(function () {
+            CloseOrder();
+        });
+        $("#btnSave").click(function () {
+            SavePodOrder();
+        });
+        $("#btnSaveChanged").click(function () {
+            SaveChangedOrder();
+        });
+        $("#btnCashPayment").click(function () {
+            ForCashPayandRefund();
+        });
+        $("#btnCashRefund").click(function () {
+            ForCashPayandRefund();
+        });
+
+        function ForCashPayandRefund() {
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-ff-cashpay',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderIssueTypeId: isseType },
+                        function (item) {
+                            if (item != undefined) {
+                                if (item.status == true) {
+                                    window.location.replace("/issue");
+                                }
+                                else { alert(item.msg); }
+                            }
+
+                        }, "json");
+                }
+            }
+        }
+
+        function ForRefund() {
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-ff-update',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderIssueTypeId: isseType, IsPartialRefund :false },
+                        function (item) {
+                            if (item != undefined) {
+                                if (item.status == true) {
+                                    window.location.replace("/issue");
+                                }
+                                else if (item.partialRefund == true) {
+
+                                        if (confirm(item.msg)) {
+                                             $.post(
+                                                '/issue-ff-update',
+                                                 { OrderIssueId: @Model.OrderIssueId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderIssueTypeId: isseType, IsPartialRefund :true },
+                                                    function (item) {
+                                                    if (item != undefined) {
+                                                        if (item.status == true) {
+                                                            window.location.replace("/issue");
+                                                        }
+                                                        else {
+                                                            alert(item.msg);
+                                                            window.location.replace("/issue");
+                                                        }
+                                                    }
+
+                                                }, "json");
+                                        }
+                                        else {
+                                            window.location.replace("/issue");
+                                         }
+                                      }
+                                else {
+                                    alert(item.msg);
+                                    window.location.replace("/issue");
+                                }
+                            }
+
+                        }, "json");
+                }
+            }
+        }
+        function ForWalletRefund() {
+            $("#wait").css("display", "block");
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            console.log(isseType);
+            console.log(strIssueType);
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-ff-update-Wallet',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderIssueTypeId: isseType },
+                        function (item) {
+                            if (item != undefined) {
+                                if (item.status == true) {
+                                    $("#wait").css("display", "none");
+                                    window.location.replace("/issue");
+                                }
+                                else {
+                                    $("#wait").css("display", "none");
+                                    alert(item.msg);
+                                    window.location.replace("/issue");
+                                }
+                            }
+
+                        }, "json");
+                }
+            }
+        }
+
+        function ForRevertWalletRefundAmount() {
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-manager-revertAmount',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderIssueTypeId: isseType },
+                        function (item) {
+                            if (item != undefined) {
+                                if (item.status == true) {
+                                    window.location.replace("/issue");
+                                }
+                                else { alert(item.msg); }
+                            }
+
+                        }, "json");
+                }
+            }
+        }
+        function Approve(isseType) {
+
+            //var t = $("#dpIssueType option").filter(function () { return $(this).html() == "PartialPay"; }).val();
+            //var t1 = $("#dpIssueType option").filter(function () { return $(this).html() == "PartialRefund"; }).val();
+            //var t2 = $("#dpIssueType option").filter(function () { return $(this).html() == "FullRefund"; }).val();
+            //var val = $("#dpIssueType").find('option:eq("PartialPay")');
+            //console.log(t + "|"+t1+"|"+t2);
+            //return;
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            //var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-manager-approve',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderIssueTypeId: isseType },
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/issue");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+        function CancelOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want cancel the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-order-cancel',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/issue");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+        function CloseOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want close the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-order-close',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/issue");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+        function SavePodOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want close the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-podorder-save',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/issue");
+                            }
+                        }, "json");
+                }
+            }
+        }
+        function SaveChangedOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want close the issue and update the status.")) {
+
+                    $.post(
+                        '/issue-changedorder-save',
+                        { OrderIssueId: @Model.OrderIssueId, Remark: remark},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/issue");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+
+        function CalAmt() {
+            var price = $("#txtPrice-Add").val();
+            var qty = $("#txtQty-Add").val();
+            if (price != "" && qty != "") {
+                var amt = price * qty;
+                $("#txtAmt-Add").val(amt);
+            }
+        }
+        $('#txtPrice-Add').change(function () {
+            CalAmt();
+        });
+        $('#txtQty-Add').change(function () {
+            CalAmt();
+        });
+        $('#btnAdd').click(function () {
+            var id = $("#txtProductId-Add").val();
+            var price = $("#txtPrice-Add").val();
+            var qty = $("#txtQty-Add").val();
+            var m = $("#txtIsMixer-Add").val();
+            var g = $("#txtIsGift-Add").val();
+            CalAmt();
+            var amt = $("#txtAmt-Add").val();
+             if (g == 'true') {
+                var row = $("#WebGrid TBODY tr:last-child").clone();
+                var shopid = $(row).children('td:nth-child(3)').text();
+                console.log(shopid);
+                AppendGiftBagRow(row, id, price, qty, @Model.Order.ShopID);
+            }
+            else if (m == 1) {
+                var row = $("#WebGrid TBODY tr:last-child").clone();
+                var shopid = $(row).children('td:nth-child(3)').text();
+                console.log(shopid);
+                AppendMixerRow(row, id, price, qty, @Model.Order.ShopID);
+            }
+            else {
+
+
+                var row = $("#WebGrid TBODY tr:last-child").clone();
+                var shopid = $(row).children('td:nth-child(3)').text();
+                console.log(shopid);
+                AppendRow(row, id, price, qty, @Model.Order.ShopID);
+            }
+        });
+        function AppendRow(row, prodId, price, qty, shopid) {
+            $.post(
+                '/detail-add',
+                { OrderIssueId: @Model.OrderIssueId, OrderId: @Model.OrderId, ProductId: prodId, ItemQty: qty, Price: price, ShopId: shopid },
+                function (item) {
+                    if (item != undefined) {
+                        if (item.status == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            alert(item.msg);
+                        }
+                    }
+                }, "json");
+        }
+        function AppendMixerRow(row, prodId, price, qty, shopid) {
+            $.post(
+                '/detail-mixer-add',
+                { OrderIssueId: @Model.OrderIssueId, OrderId: @Model.OrderId, ProductId: prodId, ItemQty: qty, Price: price, ShopId: shopid },
+                function (item) {
+                    if (item != undefined) {
+                        if (item.status == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            alert(item.msg);
+                        }
+                    }
+                }, "json");
+        }
+        function AppendGiftBagRow(row, prodId, price, qty, shopid) {
+            $.post(
+                '/detail-gift-add',
+                { OrderIssueId: @Model.OrderIssueId, OrderId: @Model.OrderId, ProductId: prodId, ItemQty: qty, Price: price, ShopId: shopid },
+                function (item) {
+                    if (item != undefined) {
+                        if (item.status == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            alert(item.msg);
+                        }
+                    }
+                }, "json");
+        }
+                                                                                                        </script>
+                                                                                                        <script>
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            $('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            console.log($(this))
+            var id = $(this).prop('id');
+            var qty = tr.find('#ItemQty-Edit').val();
+
+            if (qty < 1) {
+                alert("Qty must be greater than 0.");
+                return;
+            }
+
+
+            $.post(
+                '/detail-update',
+                { OrderIssueDetailId: id, GiftBagIssueDetailId:id, MixerIssueDetailId: id, ItemQty: qty, ShopId: @Model.Order.ShopID},
+                function (item) {
+
+                    tr.find('#ItemQty').text(qty);
+                    tr.find('#ItemQty-Edit').val(qty);
+                    var price = tr.find('#ItemPrice').text();
+                    var t = price * qty;
+                    tr.find('#ItemAmt').text(t);
+
+                    if (item.isMixer == 1) {
+
+                        var diffAmt = parseInt($('#difTotalAmt').val());
+                        var permitAmt = @permitAmt;
+                        if (item.tAmt == 0) calTotalAmt = item.tAmt + permitAmt;
+                         diffAmt = diffAmt + (item.tAmt - @origMixerTotal);
+                         calTotalAmt = (@origTotal + diffAmt)
+                        $('#calTotalAmt').val(calTotalAmt);
+                        $('#difTotalAmt').val(diffAmt);
+                        window.location.reload();
+                    }
+                    else if (item.isGift == 1) {
+
+                        var diffAmt = parseInt($('#difTotalAmt').val());
+                        var permitAmt = @permitAmt;
+                        if (item.tAmt == 0) calTotalAmt = item.tAmt + permitAmt;
+                         diffAmt = diffAmt + (item.tAmt - @origGiftTotal);
+                         calTotalAmt = (@origTotal + diffAmt)
+                        $('#calTotalAmt').val(calTotalAmt);
+                        $('#difTotalAmt').val(diffAmt);
+                        window.location.reload();
+                    }
+                    else {
+
+                        var difTotalAmt = parseInt($('#difTotalAmt').val());
+
+                        var permitAmt = @permitAmt;
+                        if (item.tAmt == 0) { calTotalAmt = item.tAmt + permitAmt; }
+
+                            difTotalAmt = difTotalAmt + (item.tAmt -@origOrderTotal);
+                            calTotalAmt = (@origTotal + difTotalAmt)
+
+                         $('#calTotalAmt').val(calTotalAmt);
+                        $('#difTotalAmt').val(difTotalAmt);
+                        window.location.reload();
+                    }
+
+                    loadProductToArray();
+
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+
+        $('.delete-item').on('click', function () {
+            if (confirm("Are you sure do you want to delete the item.")) {
+                var tr = $(this).parents('tr:first');
+                console.log($(this))
+                var id = $(this).prop('id');
+                $.post(
+                    '/detail-delete/' + id,
+                    function (item) {
+                        if (item != undefined && item.status == true) {
+                            window.location.reload();
+                        }
+                    }, "json");
+            }
+        });
+
+        $(document).ready(function () {
+            $('#WebGrid > tbody > tr').each(function (index) {
+                $(this).children('td:nth-child(1)').hide();
+                $(this).children('td:nth-child(2)').hide();
+                $(this).children('td:nth-child(3)').hide();
+                $(this).children('td:nth-child(4)').hide();
+                var issue = $(this).children('td:nth-child(1)').text();
+                var detail = $(this).children('td:nth-child(3)').text();
+                if (issue.trim() == 'True') {
+                    //$(this).css("background-color", "maroon");
+                    $(this).css("color", "red");
+                }
+                if (detail.trim() == undefined || detail.trim() == '') {
+                    //$(this).css("background-color", "maroon");
+                    $(this).css("color", "blue");
+                }
+
+            });
+
+            $('#WebGrid > thead > tr').each(function (index) {
+                $(this).children('th:nth-child(1)').hide();
+                $(this).children('th:nth-child(2)').hide();
+                $(this).children('th:nth-child(3)').hide();
+                $(this).children('th:nth-child(4)').hide();
+            });
+        });
+                                                                                                        </script>
+    <script>
+        $(document).ready(function () {
+            $(".dt1").click(function (e) {
+                $(this).nextUntil(".dt1").toggle();
+            });
+            // Hide all dd elements to start with
+            $(".dd1").hide();
+                                                                                                               
+        });                                                                                               
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".dt2").click(function (e) {
+                $(this).nextUntil(".dt2").toggle();
+            });
+            // Hide all dd elements to start with
+            $(".dd2").hide();
+
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".dt3").click(function (e) {
+                $(this).nextUntil(".dt3").toggle();
+            });
+            // Hide all dd elements to start with
+            $(".dd3").hide();
+
+        });
+
+    </script>
+
+}}

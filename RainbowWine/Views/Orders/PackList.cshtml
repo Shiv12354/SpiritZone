@@ -1,0 +1,114 @@
+﻿@model IEnumerable<RainbowWine.Data.RoutePlan>
+
+@{
+    ViewBag.Title = "PackList";
+    var pCount = ViewBag.PackCount as RainbowWine.Services.DO.PackerCount;
+}
+
+<h2>UnPacked List</h2>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+
+            window.onload = function () {
+                alert("@ViewBag.Message");
+                window.location = "/orders/PackList";
+            };
+    </script>
+
+}
+@if (pCount != null)
+{
+    <table class="table">
+        <tr>
+            <td><strong>Unpacked:</strong> @pCount.ApprovedUnPacked</td>
+            <td><strong>Out For Delivery:</strong> @pCount.OutForDelivery</td>
+            <td><strong>Packed:</strong> @pCount.Packed</td>
+            <td><strong>Issue:</strong> @pCount.Issue</td>
+        </tr>
+    </table>
+}
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DeliveryStart)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DeliveryEnd)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AssignedDate)
+        </th>
+        @*<th>
+                @Html.DisplayNameFor(model => model.SlotStart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SlotEnd)
+            </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.JobId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.isOutForDelivery)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Order.OrderStatu.OrderStatusName)
+        </th>
+        <th>
+            Assigned To
+        </th>
+        <th></th>
+    </tr>
+    @if (Model == null)
+    {
+        <tr><td colspan="9">No Data</td></tr>
+    }
+    else
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryEnd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssignedDate)
+                </td>
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.SlotStart)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SlotEnd)
+                    </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.JobId)
+                </td>
+                <td>
+                    @(item.isOutForDelivery ?? false)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Order.OrderStatu.OrderStatusName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryAgent.DeliveryExecName)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Pack", new { id = item.OrderID })
+                    @*@Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.id }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.id })*@
+                </td>
+            </tr>
+        }
+    }
+</table>

@@ -1,0 +1,694 @@
+﻿@model RainbowWine.Data.Order
+@using RainbowWine.Data
+@{
+    ViewBag.Title = "Order Detail Update";
+    int orderModifyId = (int)ViewBag.OrderModifyId;
+    var orderModify = ViewBag.OrderModify as List<OrderDetailModify>;
+    double permitAmt = Convert.ToDouble(System.Configuration.ConfigurationManager.AppSettings["PremitValue"]);
+    permitAmt = (Model == null) ? 0 : string.IsNullOrWhiteSpace(Model.LicPermitNo) ? permitAmt : 0;
+    double totalAmt = 0;//premit amount
+    double origTotal = 0;
+    bool isPodOrder = Convert.ToBoolean(ViewBag.IsPodOrder);
+    if (Model != null)
+    {
+        if (Model.OrderType == "m") { permitAmt = string.IsNullOrWhiteSpace(Model.LicPermitNo) ? permitAmt : 0; }
+        else { permitAmt = 0; }
+    }
+}
+
+<h2>Orders Detail</h2>
+
+<p>
+</p>
+<div class="row">
+    <div class="col-md-4">
+        <dl class="dl-horizontal">
+            <dt>
+                Order ID:
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Id)
+            </dd>
+            <dt>
+                Customer Name:
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Customer.CustomerName)
+            </dd>
+            <dt>
+                Customer number:
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Customer.ContactNo)
+            </dd>
+            <dt>
+                Shop Name:
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.WineShop.ShopName)
+            </dd>
+            <dt>
+                Shop number:
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.WineShop.ShopPhoneNo)
+            </dd>
+            <dt>
+                Order Placed at:
+            </dt>
+            <dd>
+                @{
+                    if (Model.OrderType == "m")
+                    {
+                        <span>Mobile</span>
+                    }
+                    else
+                    {
+                        <span>Web</span>
+                    }
+                }
+            </dd>
+        </dl>
+    </div>
+
+    <div class="col-md-4">
+        <dl class="dl-horizontal">
+            <dt>
+                Order Date:
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.OrderDate)
+            </dd>
+        </dl>
+    </div>
+    <div class="col-md-4">
+        <p>
+            @if (ViewBag.UserType == "Shopper")
+            {
+                <button id="ApproveIssue">Approve</button>
+            }
+            else
+            {
+                if (!isPodOrder)
+                {
+                    <button id="btnRefund">Full Refund</button><button id="btnPartialRefund">Partial Refund</button><button id="btnPayment">Partial Payment</button>
+                }
+                else
+                {
+                    <button id="btnSave">Save</button>
+                }
+                if (orderModifyId > 0)
+                {
+                <button id="btnClose">Close</button>
+                }
+            }
+        </p>
+        @Html.DropDownList("dpIssueType", (IEnumerable<SelectListItem>)@ViewBag.IssueType, htmlAttributes: new { @class = "form -control", @id = "dpIssueType", @style = "display:none" })
+
+        @Html.TextArea("txtRemark", new { @cols = "40", @rows = "4", @placeholder = "Provide your remarks/comments." })
+    </div>
+</div>
+@*@if (origOrder != null && origOrder.Count > 0 && ViewBag.UserType == "Shopper")
+    {*@
+<h3>Original Order List</h3>
+<div class="row">
+    <table class="table">
+        <tr>
+            <th>
+                Product Name
+            </th>
+            <th>
+                Price
+            </th>
+            <th>
+                QTY
+            </th>
+            <th>
+                Amount
+            </th>
+            <th></th>
+        </tr>
+
+        @{
+
+            foreach (var item in Model.OrderDetails)
+            {
+                double itemAmt = Convert.ToDouble(item.Price) * (item.ItemQty);
+
+                origTotal = origTotal + itemAmt;
+
+                <tr style='@((item.Issue == true) ? "color:red;" : "")'>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductDetail.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemQty)
+                    </td>
+                    <td>
+                        @itemAmt
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+</div>
+
+<h3>Order List</h3>
+@{
+    if (orderModifyId <= 0)
+    {
+        <input type="button" id="btnaddDetail" value="Update Detail" />
+    }
+}
+<div class="row">
+    @{
+        var grid = new WebGrid(orderModify, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+        grid.Pager(WebGridPagerModes.FirstLast);
+
+        @grid.GetHtml(tableStyle: "table",
+              headerStyle: "",
+              alternatingRowStyle: "alt",
+              selectedRowStyle: "select",
+              htmlAttributes: new { @id = "WebGrid" },
+              columns: grid.Columns(
+
+grid.Column("Id",
+format:@<text>
+        @Html.ActionLink(((int)item.Id).ToString(), "Edit", new { id = item.Id })
+</text>),
+grid.Column("OrderModifyId",
+format:@<text>
+        @Html.ActionLink(((int)item.OrderModifyId).ToString(), "Edit", new { id = item.Id })
+</text>),
+grid.Column("Product Name",
+format:@<text>
+        @Html.Label((string)item.ProductDetail.ProductName, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Price",
+format:@<text>
+        @Html.Label(((double)item.Price).ToString(), new { @class = "normal-mode", @id = "ItemPrice" })
+</text>
+),
+grid.Column("Qty",
+format:@<text>
+        @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "ItemQty" })
+        @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+
+</text>
+),
+grid.Column("Amt",
+format:@<text>
+        @{
+            int q = ((int)item.ItemQty);
+            double p = ((double)item.Price);
+            double amt = p * q;
+            totalAmt = totalAmt + amt;
+        }
+        @Html.Label(((int)amt).ToString(), new { @class = "normal-mode", @id = "ItemAmt" })
+</text>
+),
+grid.Column("",
+style: "col1",
+format: @<text><div style="padding-left:20px;">
+            <button class="btn btn-default edit-item display-mode " id="@item.Id">Edit</button>
+            <button class="btn btn-default display-mode delete-item" id="@item.Id">Delete</button>
+            <button class="btn btn-default save-item edit-mode" id="@item.Id">Save</button>
+            <button class="btn btn-default cancel-item edit-mode" id="@item.Id">Cancel</button>
+        </div>
+</text>)
+)
+)
+
+    }
+
+    <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td style="width: 150px">
+                Product Name:<br />
+                <input type="text" id="txtProductName-Add" style="width:140px" />
+                <input type="hidden" id="txtProductId-Add" style="width:140px" />
+            </td>
+            <td style="width: 150px">
+                Price:<br />
+                <input type="text" id="txtPrice-Add" style="width:140px" />
+            </td>
+            <td style="width: 150px">
+                Qty:<br />
+                <input type="text" id="txtQty-Add" pattern="[0-9]*" inputmode="numeric" style="width:140px" />
+            </td>
+            <td style="width: 150px">
+                Amt:<br />
+                <input type="text" id="txtAmt-Add" style="width:140px" />
+            </td>
+            <td style="width: 100px">
+                <br />
+                <input type="button" id="btnAdd" value="Add" @(orderModifyId <= 0 ? "disabled" : "")/>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<div class="row">
+    <div><input type="hidden" id="txtProductQtyAvail"></div>
+    <div class="alert-info" id="prodinfomsg"></div>
+    <div class="alert-info" id="validitemmsg"></div>
+    <div><strong>Lic Permit Amount :</strong> @permitAmt</div>
+    <div><strong>Dicount %:</strong> @(Model.DiscountUnit ?? 0)</div>
+    @{
+        var dis = Convert.ToDouble(Model.DiscountUnit);
+        if (dis > 0)
+        {
+            totalAmt = Math.Round(totalAmt - ((dis / 100) * totalAmt));
+            origTotal = Math.Round(origTotal - ((dis / 100) * origTotal));
+        }
+    }
+    <div><strong>Total Amount :</strong> @origTotal</div>
+    <div><strong>Update Total Amount :</strong> <input type="text" id="calTotalAmt" disabled value="@totalAmt"></div>
+    @{
+        double diffTotal = 0;
+
+        diffTotal = totalAmt - origTotal;
+        if (totalAmt == 0 && Model.OrderType == "m") { diffTotal -= permitAmt; }
+
+    }
+    <div>
+        <strong>Difference in Total Amount :</strong> <input type="text" disabled id="difTotalAmt" value="@(diffTotal)">
+
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+
+        loadProductToArray();
+        function loadProductToArray() {
+            var diffAmt = $('#difTotalAmt').val();
+            var btnPayment = $('#btnPayment');
+            var btnRefund = $('#btnRefund');
+            var btnPartialRefund = $('#btnPartialRefund');
+            var dpIssueType= $("#dpIssueType");
+
+            btnPayment.prop('disabled', true);
+            btnRefund.prop('disabled', true);
+            btnPartialRefund.prop('disabled', true);
+
+            btnPayment.prop('style', 'display:none');
+            btnRefund.prop('style', 'display:none');
+            btnPartialRefund.prop('style', 'display:none');
+
+            if (diffAmt < 0 && Math.abs(diffAmt) == @origTotal) {
+                btnPayment.prop('disabled', true);
+                btnRefund.prop('disabled', false);
+                btnPartialRefund.prop('disabled', true);
+
+                btnPayment.prop('style', 'display:none');
+                btnRefund.prop('style', 'display:block');
+                btnPartialRefund.prop('style', 'display:none');
+                selectByText('FullRefund');
+
+            }
+            else if (diffAmt < 0) {
+                btnPayment.prop('disabled', true);
+                btnRefund.prop('disabled', true);
+                btnPartialRefund.prop('disabled', false);
+
+                btnPayment.prop('style', 'display:none');
+                btnRefund.prop('style', 'display:none');
+                btnPartialRefund.prop('style', 'display:block');
+                selectByText('PartialRefund');
+            }
+            else if (diffAmt > 0) {
+                btnPayment.prop('disabled', false);
+                btnRefund.prop('disabled', true);
+                btnPartialRefund.prop('disabled', true);
+
+                btnPayment.prop('style', 'display:block');
+                btnRefund.prop('style', 'display:none');
+                btnPartialRefund.prop('style', 'display:none');
+                selectByText('PartialPay');
+            }
+        }
+
+        function selectByText(txt) {
+            $('#dpIssueType option')
+                .filter(function () { return $.trim($(this).text()) == txt; })
+                .attr('selected', true);
+        }
+
+        $("#btnaddDetail").click(function () {
+            AddtoOrign();
+        });
+
+        $("#btnSave").click(function () {
+            SavePodOrder();
+        });
+
+        $("#btnClose").click(function () {
+            CloseOrder();
+        });
+
+        function AddtoOrign()
+        {
+            $.post(
+                '/order-update-detail',
+                { OrderId: @Model.Id },
+                function (item) {
+                    if (item != undefined) {
+                        alert(item.msg);
+                        if (item.status == true)
+                            window.location.reload();
+                    }
+                }, "json");
+        }
+
+        function SavePodOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want close the modify and update the status.")) {
+
+                    $.post(
+                        '/ordedetail-podorder-save',
+                        { OrderModifyId: @orderModifyId, Remark: remark},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/orders");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+        function CloseOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want close the modify order and update the status.")) {
+
+                    $.post(
+                        '/orderdetail-order-close/',
+                        { OrderModifyId: @orderModifyId, Remark: remark},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/orders");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+
+        $("#txtProductName-Add").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchProduct",
+                    data: {
+                        text: request.term, shopId: @Model.ShopID
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            //console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id, price: item.price };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                //$('#productprice').attr('value', ui.item.price);
+                //$('#OrdDetail_ProductID').attr('value', pid);
+                var pid = ui.item.Id;
+
+                $("#txtPrice-Add").val(ui.item.price);
+                $("#txtProductId-Add").val(pid);
+
+                var dpShopId = '@Model.ShopID';
+                $.ajax({
+                    url: "/orders/SearchProductSelection",
+                    data: {
+                        productId: pid, shopId: dpShopId
+                    },
+                    success: function (data) {
+                        $('#txtProductQtyAvail').attr('value', data.qty);
+                        $('#prodinfomsg').html(data.msg);
+                        $('#txtQty-Add').val('0');
+                        $('#txtAmt-Add').val('');
+                        ValidateQtyItem($('#txtProductQtyAvail').val(), $('#txtQty-Add').val());
+                    }
+                });
+            }
+        });
+
+        $('#txtQty-Add').change(function () {
+            ValidateQtyItem($('#txtProductQtyAvail').val(), $(this).val());
+        });
+
+        function ValidateQtyItem(qty, item) {
+            var qtyvalue = parseInt(qty)
+            var itemvalue = parseInt(item);
+            if (qtyvalue == undefined || qtyvalue == NaN) qtyvalue = 0;
+            if (itemvalue == undefined || item == NaN) itemvalue = 0;
+            console.log(qty + "< " + item)
+            if (!isNaN(itemvalue)) {
+                //if (itemvalue <= 0) {
+                //    $('#btnItemSubmit').attr("disabled", true);
+                //}
+                //else
+                if (qtyvalue < itemvalue) {
+                    $('#validitemmsg').html('\n Selected qty should not be greater than available qty.');
+                    //$('#btnItemSubmit').attr("disabled", true);
+                }
+                else {
+                    $('#validitemmsg').html('');
+                    //$('#btnItemSubmit').attr("disabled", false);
+                }
+            }
+        }
+
+        $('#btnAdd').click(function () {
+            var id = $("#txtProductId-Add").val();
+            var price = $("#txtPrice-Add").val();
+            var qty = $("#txtQty-Add").val();
+            CalAmt();
+            var amt = $("#txtAmt-Add").val();
+            var row = $("#WebGrid TBODY tr:last-child").clone();
+            var shopid = $(row).children('td:nth-child(3)').text();
+            console.log(shopid);
+            AppendRow(row, id, price, qty, @Model.ShopID);
+
+        });
+        $('#txtPrice-Add').change(function () {
+            CalAmt();
+        });
+        $('#txtQty-Add').change(function () {
+            CalAmt();
+        });
+        function AppendRow(row, prodId, price, qty, shopid) {
+            $.post(
+                '/orderdetail-add',
+                { OrderIssueId: @orderModifyId,OrderId: @Model.Id, ProductId: prodId, ItemQty: qty, Price: price, ShopId: shopid },
+                function (item) {
+                    if (item != undefined) {
+                        if (item.status == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            alert(item.msg);
+                        }
+                    }
+                }, "json");
+        }
+        function CalAmt() {
+            var price = $("#txtPrice-Add").val();
+            var qty = $("#txtQty-Add").val();
+            if (price != "" && qty != "") {
+                var amt = price * qty;
+                $("#txtAmt-Add").val(amt);
+            }
+        }
+
+        $("#btnRefund").click(function () {
+            ForRefund();
+        });
+        $("#btnPartialRefund").click(function () {
+            ForRefund();
+        });
+        $("#ApproveIssue").click(function () {
+            Approve();
+        });
+        $("#btnPayment").click(function () {
+            Approve();
+        });
+
+        function ForRefund() {
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the modify and update the status.")) {
+
+                    $.post(
+                        '/orderdetail-ff-update',
+                        { OrderModifyId: @orderModifyId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderTypeId: isseType,OrderId: @Model.Id },
+                        function (item) {
+                            alert(item.msg);
+                            if (item != undefined && item.status == true) {
+
+                                window.location.replace("/orders");
+                            }
+                        }, "json");
+                }
+            }
+        }
+        function Approve() {
+            var remark = $("#txtRemark").val();
+            var updatedAmt = $("#calTotalAmt").val();
+            var diffAmt = $("#difTotalAmt").val();
+            var isseType = $("#dpIssueType").val();
+            var strIssueType = $("#dpIssueType option:selected").text();
+            if (strIssueType == 'Open') {
+                alert("Issue Type can not be Open.");
+                return;
+            }
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want save the modify and update the status.")) {
+
+                    $.post(
+                        '/orderdetail-manager-approve',
+                        { OrderModifyId: @orderModifyId, Remark: remark, UpdateAmt: updatedAmt, DiffAmt: diffAmt, OrderTypeId: isseType,OrderId: @Model.Id },
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/orders");
+                            }
+                        }, "json");
+                }
+            }
+        }
+
+    </script>
+
+    <script>
+            $('.edit-mode').hide();
+            $('.edit-item').on('click', function () {
+                $('.edit-mode').hide();
+                $('.delete-mode').hide();
+                $('.display-mode').show();
+                var tr = $(this).parents('tr:first');
+                tr.find('.edit-mode, .display-mode').toggle();
+            });
+            $('.cancel-item').on('click', function () {
+                var tr = $(this).parents('tr:first');
+                tr.find('.display-mode,.edit-mode').toggle();
+            });
+            $('.save-item').on('click', function () {
+                var tr = $(this).parents('tr:first');
+                console.log($(this))
+                var id = $(this).prop('id');
+                var qty = tr.find('#ItemQty-Edit').val();
+                console.log(id)
+                console.log(qty)
+                if (qty < 1) {
+                    alert("Qty must be greater than 0.");
+                    return;
+                }
+
+                $.post(
+                    '/update-orderdetail',
+                    { Id: id, ItemQty: qty, ShopId: @Model.ShopID},
+                    function (item) {
+                        tr.find('#ItemQty').text(qty);
+                        tr.find('#ItemQty-Edit').val(qty);
+                        var price = tr.find('#ItemPrice').text();
+                        var t = price * qty;
+                        tr.find('#ItemAmt').text(t);
+
+                        console.log(item);
+
+                        var permitAmt = @permitAmt;
+                        calTotalAmt = item.tAmt;
+                        if (item.tAmt == 0) calTotalAmt = item.tAmt + permitAmt;
+                        difTotalAmt = calTotalAmt-@origTotal
+                            $('#calTotalAmt').val(calTotalAmt);
+                        $('#difTotalAmt').val(difTotalAmt);
+
+                        loadProductToArray();
+                    }, "json");
+                tr.find('.edit-mode, .display-mode').toggle();
+            });
+
+            $('.delete-item').on('click', function () {
+                if (confirm("Are you sure do you want to delete the item.")) {
+                    var tr = $(this).parents('tr:first');
+                    console.log($(this))
+                    var id = $(this).prop('id');
+                    $.post(
+                        '/orderdetail-delete/' + id,
+                        function (item) {
+                            if (item != undefined && item.status == true) {
+                                window.location.reload();
+                            }
+                        }, "json");
+                }
+            });
+            $(document).ready(function () {
+                $('#WebGrid > tbody > tr').each(function (index) {
+                    $(this).children('td:nth-child(1)').hide();
+                    $(this).children('td:nth-child(2)').hide();
+                    //$(this).children('td:nth-child(3)').hide();
+                    //$(this).children('td:nth-child(4)').hide();
+                    var detail = $(this).children('td:nth-child(1)').text();
+                    //var detail = $(this).children('td:nth-child(3)').text();
+                    if (detail.trim() == 'True') {
+                        //$(this).css("background-color", "maroon");
+                        $(this).css("color", "red");
+                    }
+                    if (detail.trim() == undefined || detail.trim() == '') {
+                        //$(this).css("background-color", "maroon");
+                        $(this).css("color", "blue");
+                    }
+
+                });
+
+                $('#WebGrid > thead > tr').each(function (index) {
+                    $(this).children('th:nth-child(1)').hide();
+                    $(this).children('th:nth-child(2)').hide();
+                    //$(this).children('th:nth-child(3)').hide();
+                    //$(this).children('th:nth-child(4)').hide();
+                });
+            });
+    </script>
+}

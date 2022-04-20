@@ -1,0 +1,8 @@
+﻿@model IEnumerable<RainbowWine.Models.InventoryViewModel>
+
+@{
+    ViewBag.Title = "List";
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.FirstLast);
+    //string ShopName = (Model != null && Model.Count() > 0) ? Model.ToList()[0].ShopName : "";
+}

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<RainbowWine.Data.PenaltyDetails_Sel_Result>
+@{
+    ViewBag.Title = "agentwisepenalty";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h2>Agent wise penalty </h2>*@
+
+<br />
+<table class="table table-striped table-bordered" id="listtable">
+    <thead>
+        <tr> <td colspan="4"> <h2> Penalty & incentive</h2></td>  </tr>
+        <tr>
+            <th>
+                Delivery Agenet Name
+            </th>
+            <th>
+                Shop Name
+            </th>
+
+            <th>
+                Penalty
+            </th>
+            <th>
+                Action
+            </th>
+
+        </tr>
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryExecName)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShopName)
+
+                </td>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.TotalPenalty)
+                </td>
+
+                <td>
+                   
+
+                    @Html.ActionLink("Detail", "agentwisepenaltyDetail", new { DeliveryAgentID = item.DeliveryAgentID, DeliveryExecName= item.DeliveryExecName, ShopName= item.ShopName })
+                </td>
+            </tr>
+
+        }
+    </tbody>
+
+
+</table>

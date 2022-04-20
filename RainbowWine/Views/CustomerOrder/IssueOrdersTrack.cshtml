@@ -1,0 +1,105 @@
+﻿@model IEnumerable<RainbowWine.Data.OrderIssueTrack>
+@using RainbowWine.Data
+
+@{
+    ViewBag.Title = "Issue Orders Track";
+    var orderTrack = ViewBag.OrderTrack as List<OrderTrack>;
+}
+
+<h2>Issue Orders Tracking</h2>
+
+<p>
+    <h3>Order Track</h3>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Order Id
+        </th>
+        <th>
+            User Id
+        </th>
+        <th>
+            Track Date
+        </th>
+        <th>
+            Order Status Id
+        </th>
+        <th>
+            Remark
+        </th>
+    </tr>
+
+    @foreach (var item in orderTrack)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LogUserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrackDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderStatu.OrderStatusName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Remark)
+            </td>
+        </tr>
+    }
+
+</table>
+
+<p>
+    <h3>Order Issue Track</h3>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderIssueId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UserId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TrackDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderStatusId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Remark)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderIssueId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrackDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderStatusId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Remark)
+            </td>
+        </tr>
+    }
+
+</table>

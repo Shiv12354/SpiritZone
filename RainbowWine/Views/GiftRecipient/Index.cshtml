@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Request OTP";
+}
+
+<!--Same font as Spiritzone.in (Montserrat)-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        background-color: #fffff7;
+        font-family: "Montserrat", sans-serif;
+    }
+    /* Disabling the HR tag */
+    hr {
+        display: none;
+    }
+
+    .sz-header {
+        font-family: 'Times New Roman';
+    }
+
+    .navbar {
+        /*background-color: #8e0033 !important;*/
+        background: linear-gradient( 45deg,#8e0033 0%,#d00f54 100%);
+    }
+
+    .navbar-brand {
+        font-weight: bolder;
+        color: white !important;
+    }
+
+    .navbar-nav a {
+        font-weight: bold;
+        color: white !important;
+    }
+
+    .navbar-inverse, .navbar-collapse {
+        border: none;
+    }
+
+    .sz-logo {
+        max-width: 200px;
+    }
+
+    .sz-color {
+        color: #8e0033;
+    }
+
+    .sz-label {
+        font-weight: bold;
+    }
+
+    .sz-input::placeholder {
+        font-weight: bolder;
+    }
+
+    .sz-input {
+        background-color: #fffff7;
+        padding: 8.5px 5px 8.5px 15px;
+        border-radius: 100px;
+        border: 1px solid #8e0033;
+        box-shadow: 0px 5px 20px rgba(142, 0, 51, 0.2);
+    }
+
+    .sz-btn {
+        color: white;
+        font-weight: bolder;
+        border-radius: 50px;
+        background: linear-gradient( 45deg,#8e0033 0%,#d00f54 100%);
+        box-shadow: 0px 5px 20px rgba(142, 0, 51, 0.2);
+    }
+
+        .sz-btn:hover {
+            color: white;
+        }
+
+        .sz-btn:active {
+            background-color: #8e0033;
+            color: white;
+        }
+
+    /* Hiding the arrows from the Input tags */
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<div class="container text-center">
+    <div class="intro">
+        <img class="sz-logo" src="https://play-lh.googleusercontent.com/77K8_yfRQEuagn1wzGtVqmsPOogauY-YN9nvxg12GOvWdjDalTq_Iqhr9sT0SFwhxvU" alt="Spiritzone" />
+        <h1 class="sz-header sz-color">Welcome To SPIRITZONE</h1>
+        <h4 class="sz-color">Your contact-less digital drinking buddy</h4>
+        <p>
+            You're here because you just received a gift from a loved one via <strong><span class="sz-color">Spiritzone</span></strong>. We just need to make sure that you are the same person to whom the gift was addressed and then you should be able to see the special message sent by the sender of this gift! Kindly verify your mobile number!
+        </p>
+    </div>
+    <h4 style="font-weight: bolder; margin-top: 20px">Verify Mobile Number</h4>
+    <div>
+        <!--Putting all in a row-->
+        <div class="row">
+            <!--Changed from normal text to <label>-->
+            <!--<label id="sz-label" for="txtMobile">Mobile No:</label>-->
+            <input type="number" placeholder="Your mobile number" id="txtMobile" class="sz-input" maxlength="10" min="10" />
+            <button class="btn sz-btn" id="btnSubmit">Submit</button>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $("#btnSubmit").click(function () {
+            Save();
+        });
+        function Save() {
+            var mobile = $("#txtMobile").val();
+            if (mobile.trim() == "") {
+                alert("Please enter your Mobile Number.");
+                return;
+            }
+            else {
+                $.get(
+                    '/request-otp',
+                    { mobile: mobile },
+                    function (item) {
+                        if (item != undefined) {
+                            alert(item.msg);
+                            if (item.status == true)
+                                window.location.replace("/Index");
+                        }
+                    }, "json");
+            }
+
+        }
+    </script>
+}

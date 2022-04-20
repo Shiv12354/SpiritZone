@@ -1,0 +1,155 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<RainbowWine.Services.DO.DailyPODCashCollectionDO>
+@{
+    ViewBag.Title = "Daily PODCashCollection";
+
+}
+<h2>Daily PODCashCollection</h2>
+
+
+<div>
+
+    <div>
+        Shops
+        <select id="Shopids" multiple="multiple" required=required name="Shopidslist">
+            @if (ViewBag.shops != null)
+            {
+                foreach (var item in ViewBag.shops)
+                {
+                    if (item.Text != null)
+                    {
+                        <option  value="@item.Value">
+                            @item.Text
+                        </option>
+
+                    }
+                }
+            }
+        </select>
+
+        Date-:
+        <input type="text"  id="txtdate" />
+        <button id="btnSearch" class="display-mode">Search</button>
+
+    </div>
+
+</div>
+<br />
+<div style="text-align:right">Grand Total -:<b>@ViewBag.SumOfTotal</b></div>
+<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+    <thead class="bg-success">
+        <tr>
+            <th>
+                OrderId
+            </th>
+            <th>
+                Delivery Date
+            </th>
+            <th>
+                PODCashCollectedAmount
+            </th>
+            <th>
+                LicPermitAmount
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                ShopName
+            </th>
+           
+        </tr>
+    </thead>
+
+    @foreach (var item in Model)
+    {
+        <tbody>
+            <tr>
+                <td>
+                    @Html.Label(item.OrderId.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.DeliveryDate.ToString(), new { @class = "display-mode" })
+                </td>
+
+                <td>
+                    @Html.Label(item.PODCashPaymentAmount.ToString(), new { @class = "display-mode" })
+                </td>
+                <td>
+                    @Html.Label(item.LicPermitAmount.ToString(), new { @class = "display-mode" })
+                </td>
+
+                <td>
+                    @Html.Label(item.Total.ToString(), new { @class = "display-mode" })
+
+                </td>
+                <td>
+                    @Html.Label(item.ShopName.ToString(), new { @class = "display-mode" })
+                </td>
+
+            </tr>
+        </tbody>
+    }
+
+</table>
+<div id='Paging' style="text-align:center">
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model, page => Url.Action("DailyPODCashCollection", new { page }))
+
+</div>
+@section scripts{
+    <script src="~/Scripts/jquery.timepicker.min.js"></script>
+    <link href="~/Scripts/jquery.timepicker.min.css" rel="stylesheet" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+             $('#txtdate').datepicker();
+             $('#txtdate').datepicker('setDate', 'today');
+        });
+    </script>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $('#btnSearch').click(function () {
+            var selected = $("#Shopids option:selected");    /*Current Selected Value*/
+            var message = "";
+            var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                arrSelected.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+
+            });
+            var date = $('#txtdate').val();
+            window.location = "/orders/DailyPODCashCollection?shopids=" + arrSelected + "&date=" + date;
+                
+        });
+
+    </script>
+    <script language="javascript">
+
+        $(function () {
+            $("#Shopids").select2({
+                placeholder: '--Select Shops--',
+                closeOnSelect: false,
+                width: '70%',
+            });
+        });
+
+    </script>
+    <script language="javascript">
+        $(function () {
+            $('#choose').pagination({
+                items: 20,
+                itemsOnPage: 2,
+                cssStyle: 'light-theme',
+                onPageClick: function (pageNumber) { test(pageNumber) }
+            });
+        });
+
+    </script>
+
+}
+

@@ -1,0 +1,269 @@
+﻿<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densityDpi=device-dpi" />
+    <title>Spiritzone: Your Contact-less Digital Drinking Buddy</title>
+    <link rel="icon" href="img/favicon.png" sizes="16x16" type="image/png">
+    <meta name="description" content="Get #Spiritzoned with Maharashtra’s first contact-less online alcohol delivery app that delivers your favorite beer, wine and spirits right at your doorstep.">
+    <meta name="google-site-verification" content="Qud_gkVPZQu7RM4T1jLw_ZnijvK8s2cDc2rSL6-ifL0" />
+    <meta name="keywords" content="Alcohol delivery app, Online alcohol delivery">
+    <link rel="stylesheet" href="css/bootstrap.min-v3.css">
+    <link rel="stylesheet" href="css/verify.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="icon" href="img/favicon.png" sizes="16x16" type="image/png">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-171698831-1"></script>
+    <script>
+
+window.dataLayer = window.dataLayer || [];
+
+function gtag(){dataLayer.push(arguments);}
+
+gtag('js', new Date());
+
+gtag('config', 'UA-171698831-1');
+
+    </script>
+</head>
+<div class="js">
+    <body>
+        <!--[if lte IE 9]>
+                  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+              <![endif]-->
+        <!-- Preloader section -->
+        <div id="preloader"></div>
+        <!-- Preloader section -->
+        <div class="container">
+            <!-- AccessBox section -->
+            <div id="accessbox" class="animated bounceInDown">
+                <img class="profile-img" src="img/verify/logo.png" />
+                <h2 class="text-center">Please enter your date of birth</h2>
+                <!-- Form section-->
+                <form action="php/access.php" method="post" class="access-form">
+                    <input type="text" name="yy" id="yy" class="access-input-lg" pattern="[0-9]*" inputmode="numeric" placeholder="YYYY" maxlength="4" (keyup)="keytab($event)" required autofocus>
+                    <input type="text" name="mm" id="mm" class="access-input" pattern="[0-9]*" inputmode="numeric" placeholder="MM" maxlength="2" (keyup)="keytab($event)" required>
+                    <input type="text" name="dd" id="dd" class="access-input" pattern="[0-9]*" inputmode="numeric" placeholder="DD" maxlength="2" (keyup)="keytab($event)" required>
+                    <input type="button" name="submit" class="access-btn" value="OK" onclick="validateDate()">
+                    <div id="remember" class="checkbox text-center">
+                        <label class="text-center">
+                            <input type="checkbox" value="remember-me">
+                            Remember me
+                        </label>
+                    </div>
+                </form>
+                <!-- Form section-->
+                <h1 class="text-center"><i class="fa fa-exclamation-triangle red"></i> You must be above 21 years to enter this site</h1>
+            </div>
+            <p class="animated bounceInDown" style="font-size:9px; line-height:18px">*This notice is restricted for trade purpose and to permit holders only as per the amended Maharashtra state Excise Law, dated 12th May 2020 & following all conditions under this act. Liquor will be sold to licensed permit holders only. Deliveries in limited areas only. Drink responsibly. Orders shall be executed only after prepayment.</p>
+            <!-- AccessBox section -->
+        </div>
+        <!-- /container -->
+        <!-- JS files-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+        <!-- Pre Loader-->
+        <script type="text/javascript">
+function validateDate(){
+var y= $('#yy').val();
+var m= $('#mm').val();
+var d= $('#dd').val();
+var dt = m +"/"+d+"/"+y;
+
+if(moment(dt, 'MM/DD/YYYY',true).isValid())
+{
+dobValidate(dt);
+}
+else{
+		window.location="/error.html";
+alert("Selected date is not vlaid.");
+}
+return false;
+}
+function dobValidate(b) {
+
+
+        var today = new Date();
+        var nowyear = today.getFullYear();
+        var nowmonth = today.getMonth();
+        var nowday = today.getDate();
+
+
+        var birth = new Date(b);
+
+        var birthyear = birth.getFullYear();
+        var birthmonth = birth.getMonth();
+        var birthday = birth.getDate();
+
+        var age = nowyear - birthyear;
+        var age_month = nowmonth - birthmonth;
+        var age_day = nowday - birthday;
+
+    alert(age)
+    alert(age_month)
+    alert(age_day)
+
+        if (age > 100) {
+		window.location="/error.html";
+            //alert("Age cannot be more than 100 Years.Please enter correct age")
+            return false;
+        }
+        if (age_month < 0 || (age_month == 0 && age_day < 0)) {
+            age = parseInt(age) - 1;
+
+    }
+    alert(age);
+        //if ((age == 21 && age_month <= 0 && age_day <= 0) || age < 21) {
+    if ((age == 21 && age_month <= 0 && age_day <= 0) || age < 21) {
+		window.location="/error.html";
+            //alert("Age should be more than 21 years.Please enter a valid Date of Birth");
+            return false;
+        }
+	else{
+		window.location="/home.html";
+	}
+    }
+
+jQuery(document).ready(function($) {
+
+$(window).load(function(){
+	$('#preloader').fadeOut('slow',function(){$(this).remove();});
+});
+
+});
+
+var container = document.getElementsByClassName("access-form")[0];
+container.onkeyup = function(e) {
+    var target = e.srcElement || e.target;
+    var maxLength = parseInt(target.attributes["maxlength"].value, 10);
+    var myLength = target.value.length;
+	if (myLength === 0) {
+        var previous = target;
+        while (previous = previous.previousElementSibling) {
+            if (previous == null)
+                break;
+            if (previous.tagName.toLowerCase() === "input") {
+                previous.focus();
+                break;
+            }
+        }
+		return;
+    }
+	if(e.code == 'backspace'||e.keyCode == 8 || e.keyCode == 229){
+	return;
+	}
+	if(target.id =="mm"){
+	if (myLength < maxLength) {
+    if(parseInt(target.value).toString().length == 1 && e.code != "Backspace"){
+		    target.value = target.value.padStart(2, '0');//target.value;
+			return;
+		   }
+		   else{
+		   target.value = target.value;
+		   return;
+		   }
+	}
+
+	}
+	else if(target.id =="dd"){
+	if (myLength < maxLength) {
+    if(parseInt(target.value).toString().length == 1 && (e.code != "Backspace" || e.keyCode == 8 || e.keyCode == 229)){
+		    target.value = target.value.padStart(2, '0');//target.value;
+			return;
+		   }
+		   else{
+		   target.value = target.value;
+		   return;
+		   }
+	}
+
+	}
+    if (myLength >= maxLength) {
+	if(target.id =="mm"){
+		   //if(parseInt(target.value) == 1){
+		  // target.value = "0"+target.value;
+		   //return;
+		  // }
+		   //else
+		  // {
+
+
+		  // }
+
+		     if(target.value.charAt(1) == '0'){
+			 target.value = '0' + parseInt(e.key)
+			 }
+
+			 else if(target.value.charAt(1) == '1'){
+		   target.value =  '1'+ e.key;
+
+
+		   }
+		   else if(target.value.charAt(1) == 0){
+		   target.value =   parseInt(target.value).toString().padStart(2, '0');;
+		   }
+		   else if(target.value.charAt(0) == '0' && parseInt(target.value)>=13){
+		   target.value = target.value.charAt(1) + parseInt(e.key);
+
+		   //var a = parseInt(target.value);
+		    //target.value = a != 0 ? a + parseInt(e.key) : ;//a.padStart(2, '0');//target.value;
+		   }
+
+		   //else{
+		  // target.value = target.value.charAt(1) +parseInt(e.key);
+		   //}
+		   if(parseInt(target.value)>=13){
+		      target.value = "01"
+			  return;
+		   }
+		   }
+
+		   if(target.id =="dd"){
+		    if(parseInt(target.value).toString().length == 1){
+		   var a = parseInt(target.value).toString();
+		    target.value = a + parseInt(e.key);//a.padStart(2, '0');//target.value;
+		   }
+		   if(parseInt(target.value)>=32){
+		      target.value = "01"
+			  return;
+		   }
+		   }
+
+        var next = target;
+        while (next = next.nextElementSibling) {
+            if (next == null)
+                break;
+            if (next.tagName.toLowerCase() === "input") {
+                next.focus();
+                break;
+            }
+        }
+    }
+    // Move to previous field if empty (user pressed backspace)
+   // else if (myLength === 0) {
+   //     var previous = target;
+   //     while (previous = previous.previousElementSibling) {
+   //         if (previous == null)
+   //             break;
+   //         if (previous.tagName.toLowerCase() === "input") {
+   //             previous.focus();
+   //             break;
+   //         }
+   //     }
+    //}
+}
+        </script>
+    </body>
+</div>
+</html>

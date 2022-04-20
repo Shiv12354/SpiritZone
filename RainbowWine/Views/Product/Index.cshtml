@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Mobile Test</title>
+</head>
+<body>
+
+    <p id="text"></p>
+
+    <script type="text/javascript">
+
+        var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false);
+        //iOS = true;
+        if (iOS) {
+            window.location.href = 'https://apps.apple.com/in/app/spiritzone/id1521353304';
+        }
+        var ua = navigator.userAgent.toLowerCase();
+        var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+        if (isAndroid) {
+            window.location.href = 'https://play.google.com/store/apps/details?id=com.boxwishlabs.spiritzone';
+        }
+        //window.location.href = 'https://spiritzone.in/';
+
+		//var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+		//var element = document.getElementById('text');
+		//if (isMobile) {
+        //element.innerHTML = "You are using Mobile";
+		//} else {
+		//	element.innerHTML = "You are using Desktop";
+		//}
+    </script>
+</body>
+</html>

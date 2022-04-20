@@ -1,0 +1,118 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.ConfigMasterDO>
+
+@{
+    ViewBag.Title = "List";
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 10, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.FirstLast);
+}
+<h2>Config Master</h2>
+<br />
+<h3>
+    @Html.ActionLink("Shop List", "ShopIndex") |
+    @Html.ActionLink("Zone List", "ZoneIndex") |
+    @Html.ActionLink("Configurable List", "ConfigurableETA")
+</h3>
+<br />
+@if (Model != null && Model.Count() > 0)
+{
+    <div>
+        @grid.GetHtml(tableStyle: "table",
+                        headerStyle: "",
+                        alternatingRowStyle: "alt",
+                        selectedRowStyle: "select",
+                        htmlAttributes: new { @id = "WebGrid" },
+                        columns: grid.Columns(
+    @*grid.Column("ConfigMasterId", style: "col1",
+        format:@<text>
+                @Html.ActionLink(((int)item.ConfigMasterId).ToString(), "Save", new { id = item.ConfigMasterId })
+        </text>),*@
+grid.Column("Flag Name", style: "col2",
+format:@<text>
+        @Html.Label((string)item.KeyText, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Description", style: "col2",
+format:@<text>
+            <input type="checkbox"  value="@item.ConfigMasterId" id="@item.ConfigMasterId" class="chkhide" />
+            @*<input type="text" class="test-desc" name="name" id="Description+@item.ConfigMasterId" value="@item.Description"  style = "display: none;"/>*@
+            @Html.TextArea("Description-Edit", ((string)item.Description).ToString(), new { style = "display: none; width:500px", @class = "text" })
+</text>
+),
+grid.Column("IsActive", style: "col3",
+format: @<text>
+            @Html.DropDownList("ValueText", new List<SelectListItem>
+                            { new SelectListItem{Text="False", Value="0",Selected=@item.ValueText},
+                     new SelectListItem{Text="True", Value="1",Selected=@item.ValueText}}, new { @class = "form-inlineinput" })
+</text>
+)
+, grid.Column("Action", style: "col4",
+format: @<text><div style="padding-left:20px;">
+                <button class="btn btn-default save-item display-mode" id="@item.ConfigMasterId">Save</button>
+            </div>
+</text>)
+)
+)
+
+    </div>
+}
+else
+{
+    <h3>No Data</h3>
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script>
+        $('.save-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            var ConfigMasterId = $(this).prop('id');
+            var ValueText = tr.find("#ValueText option:selected").text();
+            var Description = tr.find('#Description-Edit').val();
+            if (confirm("Are you sure do you want Update")) {
+                $.post(
+                    '/Orders/SaveConfigMaster/',
+                    { configMasterId: ConfigMasterId, valueText: ValueText, description: Description },
+                    function (item) {
+                        tr.find('#ConfigMasterId').text(item.ConfigMasterId);
+                        tr.find('#KeyText').text(item.KeyText);
+                        tr.find("#ValueText option:selected").text(item.ValueText);
+                        alert(item.Message);
+                        if (item.status == true)
+                            window.location.replace("ConfigMaster");
+                    }, "json");
+                tr.find('.edit-mode, .edit-mode').toggle();
+
+            }
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.chkhide').on('click', function () {
+                var checkbox = $(this), // Selected or current checkbox
+                    value = checkbox.val(); // Value of checkbox
+                console.log('value');
+                if (checkbox.is(':checked')) {
+                    var row = $(this).closest("tr");
+                    $("td", row).each(function () {
+                        if ($(this).find(".text").length > 0) {
+                            $(this).find(".text").show();
+                        }
+                       
+                    });
+                } else {
+                    var row = $(this).closest("tr");
+                    $("td", row).each(function () {
+                        if ($(this).find(".text").length > 0) {
+                            $(this).find(".text").hide();
+                        }
+                    });
+                }
+
+            });
+        });
+    </script>
+
+}

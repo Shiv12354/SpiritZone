@@ -1,0 +1,118 @@
+﻿@model IEnumerable<RainbowWine.Data.Order>
+
+@{
+    ViewBag.Title = "SupplierOrder";
+    RainbowWine.Data.Supplier supplier = (RainbowWine.Data.Supplier)ViewBag.Supplier;
+}
+
+<h2>SupplierOrder</h2>
+
+<p>
+    <div class="col-md-6 dl-horizontal">
+        <dl>
+            <dt>
+                Supplier:
+            </dt>
+            <dd>@supplier.Name</dd>
+        </dl>
+    </div>
+</p>
+@*<table border="0" cellpadding="1" cellspacing="1">
+    <tr>
+        <td>
+            <input type="text" placeholder="Order Id" id="txtOrderSearch" value="@(ViewBag.soid==0?"":ViewBag.soid)" />
+        </td>
+        <td>
+            <button id="btnSearch"> Search</button>
+        </td>
+    </tr>
+</table>*@
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </th>
+        @*@<th>
+            @Html.DisplayNameFor(model => model.OrderTo)
+        </th>
+        <th>
+                @Html.DisplayNameFor(model => model.OrderAmount)
+            </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.CustomerAddressId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderGroupId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderStatu.OrderStatusName)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Id)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderDate)
+    </td>
+    @*<td>
+            @Html.DisplayFor(modelItem => item.OrderTo)
+        </td>
+        <td>
+                @Html.DisplayFor(modelItem => item.OrderAmount)
+            </td>*@
+    <td>
+        @Html.DisplayFor(modelItem => item.CustomerAddressId)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderGroupId)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderStatu.OrderStatusName)
+    </td>
+    <td>
+        @Html.RouteLink("Details", "GetMultipeOrderDetail", new { orderId = item.Id })
+    </td>
+</tr>
+    }
+
+</table>
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+
+        $("#txtOrderSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchSupplierOrder",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+
+        $('#btnSearch').click(function () {
+            var soid = $('#txtOrderSearch').val();
+            window.location = "/orders/supplierorder?soid=" + soid;
+        })
+    </script>
+}

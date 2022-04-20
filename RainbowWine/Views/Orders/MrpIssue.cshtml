@@ -1,0 +1,254 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.OrderDetailMrpIssueDO>
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Index";
+    string userType = ViewBag.UserType as string;
+    bool logonly = (string.Compare(User.Identity.GetUserName(), "cash1@rainmail.com", true) == 0);
+    double totalAmt = 0;//premit amount
+    double origTotal = 0;
+    double permit = 5;
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+
+        $("#txtOrderSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchOrder",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+        $('#btnSearch').click(function () {
+           var soid = $('#txtOrderSearch').val();
+            window.location = "/orders/MrpIssue?orderId=" + soid;
+        })
+
+        function CalAmt() {
+            var tnewamt = parseInt($("#tnewamt").val());
+            var tamt = parseInt($("#tamt").val());
+            var newTotalAmt = 0;
+            $.each($("#mrpissue tbody tr"), function () {
+                if ($(this).find('td:eq(0)').html() != undefined) {
+                   var ItemQty = $(this).find('td:eq(0)').html();
+                   var  NewMrp = $(this).find('td:eq(5) input').val();
+                   
+                    if (NewMrp != "" && ItemQty != "") {
+                        var amt = NewMrp * ItemQty;
+                        newTotalAmt = newTotalAmt + amt;
+                        $(this).find('td:eq(6) input').val(amt);
+                    }
+                }
+            });
+            $("#tnewamt").val(newTotalAmt);
+            var diffamt = newTotalAmt - tamt;
+            $("#diffamt").val(diffamt);
+        }
+        $('.clsnewmrp').change(function () {
+            CalAmt();
+        });
+        $("#btnSaveChanged").click(function () {
+           SaveChangedOrder();
+        });
+        function SaveChangedOrder() {
+            var remark = $("#txtRemark").val();
+            if (remark.trim() == "") {
+                alert("Please enter remark/comment.");
+                return;
+            }
+            else {
+                if (confirm("Are you sure do you want to create mrpissue")) {
+                    var orderArr = [];
+                     $.each($("#mrpissue tbody tr"), function () {
+                         if ($(this).find('td:eq(0)').html() != undefined) {
+                             orderArr.push({
+                                 ItemQty: $(this).find('td:eq(0)').html(),
+                                 ProductID: $(this).find('td:eq(1)').html(),
+                                 Price: $(this).find('td:eq(2)').html(),
+                                 Amount: $(this).find('td:eq(3)').html(),
+                                 IsMrpIssue: $(this).find('td:eq(4) input').val(),
+                                 NewMrp: $(this).find('td:eq(5) input').val(),
+                                 NewAmount: $(this).find('td:eq(6) input').val(),
+                                 ProductID: $(this).find('td:eq(7) input').val(),
+                                 OrderId: $(this).find('td:eq(8) input').val()
+                                
+                             });
+                         }
+                    });
+                    var remark = $("#txtRemark").val();
+                    var totalAmount = $("#tamt").val();
+                    var totalNewAmount = $("#tnewamt").val();
+                    var diffAmount = $("#diffamt").val();
+                    console.log(orderArr);
+                    $.post(
+                        '/mrpissue-save',
+                        { orderDetail: orderArr, remarks: remark, totalAmount: totalAmount, totalNewAmount: totalNewAmount, diffAmount: diffAmount},
+                        function (item) {
+                            if (item != undefined) {
+                                alert(item.msg);
+                                if (item.status == true)
+                                    window.location.replace("/mrpissue-save");
+                            }
+                        }, "json");
+                }
+            }
+        };
+    </script>
+}
+<h2>ORDER MRP ISSUE</h2>
+
+
+
+<table border="0" cellpadding="1" cellspacing="1">
+    <tr>
+        
+        <td>
+            <input type="text" placeholder="Order Id" id="txtOrderSearch" value="@(ViewBag.soid==0?"":ViewBag.soid)" />
+        </td>
+       
+        <td>
+            <button id="btnSearch"> Search</button>
+        </td>
+    </tr>
+</table>
+
+<br />
+<table border="0" cellpadding="1" cellspacing="1">
+    <tr>
+        <th>Order Id</th> <td>:</td>
+        @*<td>@Model.FirstOrDefault().OrderId</td>*@
+    </tr>
+</table>
+<br />
+   <table class="table" id="mrpissue">
+       <tr>
+           <th>
+               Item Qty
+           </th>
+           <th>
+               Item
+           </th>
+           <th>
+               Price
+           </th>
+           <th>
+               Amount
+           </th>
+           <th>
+               Issue
+           </th>
+           <th>
+               New Mrp
+           </th>
+           <th>
+               New Amt
+           </th>
+
+           <th></th>
+           <th></th>
+           <th></th>
+
+       </tr>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            @{
+                int q = ((int)item.ItemQty);
+                double p = ((double)item.Price);
+                double amt = p * q;
+                totalAmt = totalAmt + amt;
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemQty ,new { @id="qty"})
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductDetail.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+
+            <td>
+                @Convert.ToInt64(item.ItemQty * item.Price)
+            </td>
+            <td>
+                @*@Html.CheckBoxFor(modelItem => item.IsMrpIssue)*@
+                <input type="checkbox" id="chkIsMrpIssue" value="@item.IsMrpIssue" />
+            </td>
+            <td>
+                <input type="text" class="clsnewmrp"  id="newMrp" value="@p" />
+
+            </td>
+            <td>
+                <input type="text"  id="newMrpAmount" value="@amt" />
+            </td>
+            <td>
+                @Html.HiddenFor(modelItem => item.ProductID)
+            </td>
+            <td>
+                @Html.HiddenFor(modelItem => item.OrderId)
+            </td>
+        </tr>
+        }
+    </tbody>
+    @if (Model.Count() <= 0)
+    {
+        <tr>
+            <td colspan="10">
+                No Record Found.
+            </td>
+        </tr>
+    }
+   
+    </table>
+<br />
+<br />
+<table class="table">
+    @if (Model.Count() > 0)
+    {
+        <tr>
+            <th>Permit Amount</th>
+            <td> RS : 5</td>
+        </tr>
+        <tr>
+            <th>Total Amount </th>
+            <td><input type="text" id="tamt" value="@totalAmt" /></td>
+        </tr>
+        <tr>
+            <th>New Total Amount</th>
+            
+            <td><input type="text" id="tnewamt" value="@totalAmt" /></td>
+        </tr>
+        <tr>
+            @{ 
+                var diff = totalAmt - totalAmt;
+            }
+            <th>Difference</th>
+            
+            <td><input type="text" id="diffamt" value="@diff" /></td>
+        </tr>
+        <tr>
+            <td> @Html.TextArea("txtRemark", new { @cols = "40", @rows = "4", @placeholder = "Provide your remarks/comments." })</td>
+
+        </tr>
+        <tr>
+            <td><button id="btnSaveChanged">Save</button></td>
+        </tr>
+    }
+</table>

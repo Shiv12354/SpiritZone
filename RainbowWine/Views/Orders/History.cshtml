@@ -1,0 +1,57 @@
+﻿@model IEnumerable<RainbowWine.Data.OrderTrack>
+
+@{
+    ViewBag.Title = "OrderHistory";
+}
+
+<h2>OrderHistory</h2>
+
+<p>
+    @*@Html.ActionLink("Back to List", "Index")*@
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TrackDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StatusId)
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.LogUserId)*@
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LogUserName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TrackDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderStatu.OrderStatusName)
+        </td>
+        <td>
+            @*@Html.DisplayFor(modelItem => item.LogUserId)*@
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LogUserName)
+        </td>
+        @*<td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.OrderTrackId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.OrderTrackId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.OrderTrackId })
+        </td>*@
+    </tr>
+}
+
+</table>

@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewBag.Title = "AnalyticsLoad";
+}
+
+<h2>Analytics</h2>
+@section scripts{
+    <script src="https://ec2amaz-j836kgo.qonverse.ai/resources/assets/external/requirejs/require.js"></script>
+    <script src="~/Scripts/requireJS.js"></script>
+    <script>
+        var requireJsConfig = {
+            host: "ec2amaz-j836kgo.qonverse.ai",
+            prefix: '/',
+            port: '',//443,
+            isSecure: true
+        };
+
+        //var app = qlikLoad.openApp(qAppId, this.requireJsConfig);
+    </script>
+}
+<iframe width="100%" height="600" frameborder="0" src="https://ec2amaz-cp0fntp.spiritzone.in/single/?appid=73b61c0f-4bff-48a1-974d-080d30dee06b&sheet=b3aab5ac-5100-45c6-bd61-4d18a094d280&select=clearall"></iframe>

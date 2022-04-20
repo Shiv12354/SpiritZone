@@ -1,0 +1,37 @@
+﻿@model RainbowWine.Models.Packers.FileUpload
+
+@{
+    ViewBag.Title = "File Upload & Download";
+}
+
+
+<div class="row">
+    <div class="col-md-10">
+        <h2>Uploaded File Details</h2>
+        <div class="form-group">
+            <div>
+                @{
+                    var grid = new WebGrid(source: Model.FileList, canPage: true, rowsPerPage: 15);
+                    @grid.GetHtml(tableStyle: "table table-striped table-bordered table-hover", headerStyle: "webgrid-header",
+                        alternatingRowStyle: "webgrid-alternating-row", selectedRowStyle: "webgrid-selected-row",
+                        footerStyle: "webgrid-footer", rowStyle: "webgrid-row-style", mode: WebGridPagerModes.All,
+                        firstText: "<< First", previousText: "< Prev", nextText: "Next >", lastText: "Last >>",
+                        htmlAttributes: new { id = "DataTable" },
+                        columns: grid.Columns(
+                            grid.Column("FileName", header: "FILE NAME", canSort: false),
+                            grid.Column("FileUrl", header: "FILE PATH", canSort: false),
+                             grid.Column("CreatedDate", header: "UPDATED DATE", canSort: false),
+                        grid.Column(header: "DOWNLOAD", format:
+                            @<text>
+                                <a href="~/Orders/Download?FileID=@item.FileId"><img src="~/Images/download.png" style="width: 15px; height: 15px" title="Download" /></a>
+                            </text>)
+));
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}  

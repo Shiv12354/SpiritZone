@@ -1,0 +1,119 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.WineShopDO>
+
+@{
+    ViewBag.Title = "List";
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 10, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.FirstLast);
+    string ShopName = (Model != null && Model.Count() > 0) ? Model.ToList()[0].ShopName : "";
+}
+<h2>Shops List</h2>
+<br />
+<h3>@Html.ActionLink("Config Master", "ConfigMaster")</h3>
+<br />
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div>
+        @grid.GetHtml(tableStyle: "table",
+                        headerStyle: "",
+                        alternatingRowStyle: "alt",
+                        selectedRowStyle: "select",
+                        htmlAttributes: new { @id = "WebGrid" },
+                        columns: grid.Columns(
+
+    grid.Column("Id",
+    format:@<text>
+            @Html.ActionLink(((int)item.ShopId).ToString(), "Edit", new { id = item.ShopId })
+    </text>),
+grid.Column("Shop Name", style: "col2",
+format:@<text>
+                    @Html.Label((string)item.ShopName, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Address", style: "col3",
+format:@<text>
+        <p>@item.Address</p>
+                @*@Html.Label(((string)item.Address).ToString())
+                @Html.Label(((string)item.Address).ToString(), new { @class = "edit-mode" })*@
+
+</text>
+), grid.Column("Vat", style: "col4",
+format:@<text>
+                @Html.Label(((string)item.Vat).ToString(), new { @class = "normal-mode" })
+</text>
+),
+grid.Column("ContactNo", style: "col5",
+format:@<text>
+                @Html.Label(((string)item.ShopPhoneNo).ToString(), new { @class = "display-mode" })
+                @Html.TextBox("ContactNo-Edit", ((string)item.ShopPhoneNo).ToString(), new { @class = "edit-mode", @type = "number", size = 10, style = "width: 100px;" })
+</text>
+),
+grid.Column("Flag", style: "col6",
+format: @<text>
+                @Html.Label(((bool)item.OperationFlag).ToString(), new { @class = "display-mode" })
+                @Html.DropDownList("OperationFlag", new List<SelectListItem>
+                                { new SelectListItem{Text="False", Value="0",Selected=@item.OperationFlag},
+                         new SelectListItem{Text="True", Value="1",Selected=@item.OperationFlag}}, new { @class = "edit-mode" })
+</text>
+), grid.Column("",
+style: "col7",
+format: @<text><div style="padding-left:20px;">
+                        <button class="btn btn-default edit-item display-mode " id="@item.ShopId">Edit</button>
+                        <button class="btn btn-default save-item edit-mode" id="@item.ShopId">Save</button>
+                        <button class="btn btn-default cancel-item edit-mode" id="@item.ShopId">Cancel</button>
+                    </div>
+</text>)
+)
+)
+
+    </div>
+}
+else
+{
+    <h3>No Data</h3>
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            $('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            var shopId = $(this).prop('id');
+            var contactNo = tr.find('#ContactNo-Edit').val();
+            var flag = tr.find("#OperationFlag option:selected").text();
+            if (contactNo.length > 10 || contactNo.length < 10) {
+                alert("ContactNo length should be equal to 10 please update");
+                return true;
+            }
+            $.post(
+                '/Orders/UpdateShopDetail/',
+                { shopId: shopId, contactNo: contactNo, flag: flag },
+                function (item) {
+                    tr.find('#ShopId').text(item.shopId);
+                    tr.find('#ShopName').text(item.ShopName);
+                    tr.find('#Address').text(item.Address);
+                    tr.find('#Vat').text(item.Vat);
+                    tr.find('#ShopPhoneNo').text(item.ShopPhoneNo);
+                    tr.find("#OperationFlag option:selected").text(item.OperationFlag);
+                    alert(item.Message);
+                    if (item.status == true)
+                        window.location.replace("ShopIndex");
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+    </script>
+
+}

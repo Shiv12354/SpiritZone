@@ -1,0 +1,166 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.BrandManufacturerDO>
+
+<h2>Brand Manufacturer</h2>
+Manufacturer Name <b>:</b> <label id="lblProductName">@ViewBag.ManufacturerName</label> <label id="lblManufacturerId" style="display:none">@ViewBag.Id</label>
+<h3>Add  Brand Manufacturer</h3>
+<div>
+    <br />
+    Brand Manufacturer
+    <select id="allBrandManufacturerlistId" multiple="multiple" required=required name="allBrandManufacturerlist" size="10" class="4col formcls">
+        @if (ViewBag.AllBrandManufacturerList != null)
+        {
+            foreach (var item in ViewBag.AllBrandManufacturerList)
+            {
+                if (item.Text != null)
+                {
+                    <option selected="selected" disabled="disabled" class="ms-elem-selectable" value="@item.Value">@item.Text</option>
+
+                }
+
+            }
+            foreach (var item in Model)
+            {
+                if (item.BrandName != null)
+                {
+                    <option value="@item.BrandId">
+                        @item.BrandName
+                    </option>
+
+                }
+
+            }
+        }
+    </select>
+    <button id="btnSave">Save</button>
+</div>
+<br />
+<br />
+<h3>Remove BrandManufacturer</h3>
+
+<div>
+    <br />
+    Brand Manufacturer
+    <select id="BrandManufacturerlistId" multiple="multiple" required=required name="BrandManufacturerlist" class="4col formcls">
+        @if (ViewBag.SingleBrandManufacturer != null)
+        {
+            foreach (var item in ViewBag.SingleBrandManufacturer)
+            {
+                if (item.Text != null)
+                {
+                    <option value="@item.Value">
+                        @item.Text
+                    </option>
+
+                }
+            }
+        }
+    </select>
+    <button id="btnUpdate">Update</button>
+</div>
+
+
+<style>
+    .ms-options-wrap > .ms-options > ul label {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        padding: 4px;
+        margin: 1px 0;
+        background-color: #9DCEFF;
+    }
+
+        .ms-options-wrap > .ms-options > ul li.selected label,
+        .ms-options-wrap > .ms-options > ul label:hover {
+            background-color: #003A75;
+            color: #fff;
+        }
+</style>
+
+@section scripts{
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.min.js" integrity="sha512-ljeReA8Eplz6P7m1hwWa+XdPmhawNmo9I0/qyZANCCFvZ845anQE+35TuZl9+velym0TKanM2DXVLxSJLLpQWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.css" integrity="sha512-DJ1SGx61zfspL2OycyUiXuLtxNqA3GxsXNinUX3AnvnwxbZ+YQxBARtX8G/zHvWRG9aFZz+C7HxcWMB0+heo3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        $(function () {
+            $('#allBrandManufacturerlistId').multiselect({
+                includeSelectAllOption: true,
+                nonSelectedText: '--Select BrandManufacturer--', //"Select Competitor", /*To enable the Select all Option*/
+                selectAllValue: 'multiselect-all',     /*The value used for the select all option can be configured using the selectAllValue*/
+                enableFiltering: true,   /*A filter input will be added to dynamically filter all the options*/
+                enableCaseInsensitiveFiltering: true,  /*To enable Case Insenstitive Filtering (Upper and Lower Case Letters)*/
+                maxHeight: '200',
+                buttonWidth: '200'
+                
+
+            });
+        });
+
+        $(function () {
+            $('#BrandManufacturerlistId').multiselect({
+                columns: 1,
+                includeSelectAllOption: true,
+                nonSelectedText: '--Select BrandManufacturer--', /*To enable the Select all Option*/
+                selectAllValue: 'multiselect-all',     /*The value used for the select all option can be configured using the selectAllValue*/
+                enableFiltering: true,   /*A filter input will be added to dynamically filter all the options*/
+                enableCaseInsensitiveFiltering: true,  /*To enable Case Insenstitive Filtering (Upper and Lower Case Letters)*/
+                maxHeight: '200',
+                buttonWidth: '200',
+
+
+            });
+        });
+    </script>
+
+    <script>
+
+        $('#btnSave').on('click', function () {
+            var selected = $("#allBrandManufacturerlistId option:selected");    /*Current Selected Value*/
+            var message = "";
+                var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                    arrSelected.push($(this).val());    /*Stack the Value*/
+                    message += $(this).text() + " " + $(this).val() + "\n";
+
+            });
+            var ManufacturerId = $("#lblManufacturerId").text();
+            if (arrSelected == null || arrSelected == "") {
+                alert("Please select BrandManufacturer from dropdown");
+                return false;
+            }
+            $.post(
+                '/Manufacturer/AddAndUpdateBrandManufacturer/',
+                { manufacturerId: ManufacturerId, brandIds: arrSelected,action: "Add" },
+                function (item) {
+                    alert("BrandManufacturer Added Successfully");
+                    window.location.reload();
+                }, "json");
+        });
+
+        $('#btnUpdate').on('click', function () {
+            var selected = $("#BrandManufacturerlistId option:selected");    /*Current Selected Value*/
+            var message = "";
+            var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                arrSelected.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+            });
+            var ManufacturerId = $("#lblManufacturerId").text();
+            if (arrSelected == null || arrSelected == "") {
+                alert("Please select BrandManufacturer from dropdown");
+                return false;
+            }
+            $.post(
+                '/Manufacturer/AddAndUpdateBrandManufacturer/',
+                { manufacturerId: ManufacturerId, brandIds: arrSelected, action: "Update" },
+                function (item) {
+                    alert("BrandManufacturer Updated Successfully");
+                    window.location.reload();
+                }, "json");
+        });
+    </script>
+
+}
+
+

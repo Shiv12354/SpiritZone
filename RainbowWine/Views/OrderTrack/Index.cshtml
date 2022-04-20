@@ -1,0 +1,56 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Track Map</title>
+
+    <link href="css/map.css" rel="stylesheet" />
+    <link href="css/font-awesome.css" rel="stylesheet" />
+    <script src="js/jquery-3.5.1.min.js"></script>
+
+
+</head>
+<body>
+    <div id="map"></div>
+    <div class="container-info">
+        <div id="info-display">
+            <div>
+                <p>Tracking Order</p>
+                <span>ORDER ID : <span id="span_invoiceid">11235</span></span>
+            </div>
+            <div id="arrival_div"> <span>Arriving in <span id="time"> 15:00:00 </span>min</span></div>
+            <div id="div_info">
+                <div><div class="circleshape"><span class="fa fa-comment-o"></span></div>Message</div>
+                <div><div class="circleshape"><span class="fa fa-phone"></span></div>Call</div>
+            </div>
+            <div class="btn_order_details"><button>ORDER DETAILS</button></div>
+        </div>
+    </div>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAoxqWHH8GVZPFqT7X8JlO1RE3cfoTlNo0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marker-animate-unobtrusive/0.2.8/vendor/markerAnimate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marker-animate-unobtrusive/0.2.8/SlidingMarker.min.js"></script>
+    <script src=" https://maps.googleapis.com/maps/api/js?key=AIzaSyAoxqWHH8GVZPFqT7X8JlO1RE3cfoTlNo0&callback=initialize"></script>
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js"></script>
+
+    <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-analytics.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-firestore.js"></script>
+    <script>
+        // TODO: Replace the following with your app's Firebase project configuration
+
+    </script>
+    <script src="js/Route.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.ProductCompetitorLinkDO>
+
+<h2>Competitor Product</h2>
+Product Name <b>:</b> <label id="lblProductName">@ViewBag.ProductName</label> <label id="lblProductNameId" style="display:none">@ViewBag.Id</label>
+<h3>Add Competitor</h3>
+<div>
+    <br />
+    Competitor Products
+    <select id="allcompetitorlistId" multiple="multiple" required=required name="allcompetitorlist" size="10" class="4col formcls">
+        @if (ViewBag.AllProductList != null)
+        {
+            foreach (var item in ViewBag.AllProductList)
+            {
+                if (item.Text != null)
+                {
+                 <option selected="selected" disabled="disabled" class="ms-elem-selectable" value="@item.Value">@item.Text</option>                  
+
+                }
+
+            }
+            foreach (var item in Model)
+            {
+                if (item.CopProductName != null)
+                {
+                    <option value="@item.CompetitorProductRefIDs">
+                        @item.CopProductName
+                    </option>
+
+                }
+
+            }
+        }
+    </select>
+    <button id="btnSave">Save</button>
+</div>
+<br />
+<br />
+<h3>Remove Competitor</h3>
+
+<div>
+    <br />
+    Competitor Products
+    <select id="competitorlistId" multiple="multiple" required=required name="competitorlist" class="4col formcls">
+        @if (ViewBag.SingleProduct != null)
+        {
+            foreach (var item in ViewBag.SingleProduct)
+            {
+                if (item.Text != null)
+                {
+                    <option value="@item.Value">
+                        @item.Text
+                    </option>
+
+                }
+            }
+        }
+    </select>
+    <button id="btnUpdate">Update</button>
+</div>
+
+
+<style>
+    .ms-options-wrap > .ms-options > ul label {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        padding: 4px;
+        margin: 1px 0;
+        background-color: #9DCEFF;
+    }
+
+        .ms-options-wrap > .ms-options > ul li.selected label,
+        .ms-options-wrap > .ms-options > ul label:hover {
+            background-color: #003A75;
+            color: #fff;
+        }
+</style>
+
+@section scripts{
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.min.js" integrity="sha512-ljeReA8Eplz6P7m1hwWa+XdPmhawNmo9I0/qyZANCCFvZ845anQE+35TuZl9+velym0TKanM2DXVLxSJLLpQWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.css" integrity="sha512-DJ1SGx61zfspL2OycyUiXuLtxNqA3GxsXNinUX3AnvnwxbZ+YQxBARtX8G/zHvWRG9aFZz+C7HxcWMB0+heo3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        $(function () {
+            $('#allcompetitorlistId').multiselect({
+                includeSelectAllOption: true,
+                nonSelectedText: '--Select Competitor--', //"Select Competitor", /*To enable the Select all Option*/
+                selectAllValue: 'multiselect-all',     /*The value used for the select all option can be configured using the selectAllValue*/
+                enableFiltering: true,   /*A filter input will be added to dynamically filter all the options*/
+                enableCaseInsensitiveFiltering: true,  /*To enable Case Insenstitive Filtering (Upper and Lower Case Letters)*/
+                maxHeight: '200',
+                buttonWidth: '400',
+                afterSelect: function (values, text) {
+                    var _self = this;
+
+                    // if there are more than 6 elements selected
+                    console.log("Shiv" + this.$element.val().length);
+                    if (this.$element.val().length > 5) {
+        
+                        // disable all selectable elements
+                        var selectables = this.$container.find('.ms-elem-selectable');
+                        selectables.addClass(_self.options.disabledClass);
+
+                        // disable all <option>            
+                        var options = _self.$element.find('option');
+                        options.prop('disabled', true);
+                    }
+                }
+            });
+        });
+
+        $(function () {
+            $('#competitorlistId').multiselect({
+                columns: 1,
+                includeSelectAllOption: true,
+                nonSelectedText: '--Select Competitor--', /*To enable the Select all Option*/
+                selectAllValue: 'multiselect-all',     /*The value used for the select all option can be configured using the selectAllValue*/
+                enableFiltering: true,   /*A filter input will be added to dynamically filter all the options*/
+                enableCaseInsensitiveFiltering: true,  /*To enable Case Insenstitive Filtering (Upper and Lower Case Letters)*/
+                maxHeight: '200',
+                buttonWidth: '400',
+                
+
+            });
+        });
+    </script>
+
+    <script>
+
+        $('#btnSave').on('click', function () {
+            var selected = $("#allcompetitorlistId option:selected");    /*Current Selected Value*/
+            var message = "";
+                var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                    arrSelected.push($(this).val());    /*Stack the Value*/
+                    message += $(this).text() + " " + $(this).val() + "\n";
+                
+            });
+            var ProductId = $("#lblProductNameId").text();
+            if (arrSelected == null || arrSelected == "") {
+                alert("Please select Product from dropdown");
+                return false;
+            }
+            $.post(
+                '/Orders/AddAndUpdateCompetitorProduct/',
+                { id: ProductId, competPrudts: arrSelected,action: "Add" },
+                function (item) {
+                    alert("Competitor Product Added Successfully");
+                    window.location.reload();
+                }, "json");
+        });
+
+        $('#btnUpdate').on('click', function () {
+            var selected = $("#competitorlistId option:selected");    /*Current Selected Value*/
+            var message = "";
+            var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                arrSelected.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+            });
+            var ProductId = $("#lblProductNameId").text();
+            if (arrSelected == null || arrSelected == "") {
+                alert("Please select Product from dropdown");
+                return false;
+            }
+            $.post(
+                '/Orders/AddAndUpdateCompetitorProduct/',
+                { id: ProductId, competPrudts: arrSelected,action :"Update" },
+                function (item) {
+                    alert("Competitor Product Updated Successfully");
+                    window.location.reload();
+                }, "json");
+        });
+    </script>
+
+}

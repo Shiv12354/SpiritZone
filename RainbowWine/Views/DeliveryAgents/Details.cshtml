@@ -1,0 +1,106 @@
+﻿@model RainbowWine.Data.DeliveryAgent
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>DeliveryAgent</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DeliveryExecName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeliveryExecName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastDeliveryOn)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastDeliveryOn)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Contact)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Contact)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TravelMode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TravelMode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Coverage)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Coverage)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsAtShop)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsAtShop)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ExciseID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ExciseID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DocPath)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DocPath)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DeliverySlot.DeliverySlotID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DeliverySlot.DeliverySlotID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WineShop.ShopName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WineShop.ShopName)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @*@Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |*@
+    @Html.ActionLink("Back to List", "Index")
+</p>

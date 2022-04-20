@@ -1,0 +1,58 @@
+﻿@model RainbowWine.Data.OrderDetail
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>OrderDetail</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemQty)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ItemQty)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Order.OrderPlacedBy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Order.OrderPlacedBy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductDetail.ProductName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductDetail.ProductName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WineShop.ShopName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WineShop.ShopName)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

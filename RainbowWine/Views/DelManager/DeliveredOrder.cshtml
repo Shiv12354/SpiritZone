@@ -1,0 +1,223 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.RoutePlanDO>
+
+@{
+    ViewBag.Title = "Delivery";
+}
+<h3>
+    Track Agents
+</h3>
+<p wrap>
+    <input type="text" placeholder="Issue Id" id="txtIssueSearch" value="@(ViewBag.IssueId==0?"":ViewBag.soid)" /> or
+    <input type="text" placeholder="Order Id" id="txtOrderSearch" value="@(ViewBag.OrderId==0?"":ViewBag.soid)" />
+    @Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)@ViewBag.ShopId, "Select Shop", htmlAttributes: new { @class = "form-control", @id = "dpShopId" })
+    @Html.DropDownList("dpStatusId", (IEnumerable<SelectListItem>)@ViewBag.StatusId, "Select Status", htmlAttributes: new { @class = "form-control", @id = "dpStatusId" })
+
+    <button id="btnSearch"> Search</button>
+    <button id="btnClearSelection"> Clear Selection</button>
+    @if (ViewBag.UserType != "DeliverySupervisor")
+    {
+
+        <a href="@ViewBag.DelTrackUrl" target="_blank">Track Agents</a>
+    }
+</p>
+@if (Model != null && Model.Count() > 0)
+{
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.AssignedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderID)
+            </th>
+            <th>
+                Approved Date
+            </th>
+            <th>
+                Delivery Agent Name
+            </th>
+            @if (ViewBag.UserType != "DeliverySupervisor")
+            {
+                <th>
+                    Customer
+                </th>
+                <th>
+                    Contact No
+                </th>
+            }
+            @if (ViewBag.UserType != "DeliverySupervisor")
+            {
+                <th>
+                    CustomerAddress
+                </th>
+            }
+                <th>
+                    StatusName
+                </th>
+                <th>
+                    Out For Delivery
+                </th>
+                <th>
+                    Committed Start ETA
+                </th>
+                <th>
+                    Committed End ETA
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.JobId)
+                </th>
+                <th></th>
+            </tr>
+
+        @foreach (var item in Model)
+        {
+    <tr>
+        <td>
+            @if (item.OutForDelivery)
+            {
+                @*<a href="@item.DelTrackUrl" target="_blank">Track</a>*@
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AssignedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ApprovedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DeliveryAgent.DeliveryExecName)
+        </td>
+        @if (ViewBag.UserType != "DeliverySupervisor")
+        {
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.CustomerName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.ContactNo)
+            </td>
+        }
+        @if (ViewBag.UserType != "DeliverySupervisor")
+        {
+            <td>
+                @item.OrderAddress.Flat
+                ,
+                @item.OrderAddress.Address
+                ,
+                @item.OrderAddress.Landmark
+            </td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.Order.OrderStatu.OrderStatusName)
+            </td>
+            <td>
+                @(item.OutForDeliveryDate)
+            </td>
+            <td>
+                @(item.ETA?.CommittedTime)
+            </td>
+            <td>
+                @(item.ETA?.CommittedTimeEnd)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JobId)
+            </td>
+            <td>
+                @if (ViewBag.UserType != "DeliverySupervisor")
+                {
+                    @Html.ActionLink("Details", "Details", "Orders", new { id = item.OrderID }, null)
+                }
+
+                @Html.ActionLink("Track", "History", "Orders", new { id = item.OrderID }, null)
+            </td>
+        </tr>
+        }
+
+    </table>
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $("#txtShopSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchShop",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                var sid = ui.item.Id;
+                $('#dpShopId').val(sid).attr("selected", "selected");
+            }
+        });
+
+        $("#txtOrderSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchOrder",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+
+        $("#txtIssueSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchIssue",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 1,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+        $('#btnSearch').click(function () {
+            var shopid = $('#dpShopId').val();
+            var dpStatusId = $('#dpStatusId').val();
+            var isId = $('#txtIssueSearch').val();
+            var oId = $('#txtOrderSearch').val();
+            window.location = "/delmanager/DeliveredOrder?shopId=" + shopid + "&statusId=" + dpStatusId + "&isId=" + isId + "&oId=" + oId;
+        })
+        $('#btnClearSelection').click(function () {
+            window.location = "/delmanager/DeliveredOrder";
+        })
+
+    </script>
+}

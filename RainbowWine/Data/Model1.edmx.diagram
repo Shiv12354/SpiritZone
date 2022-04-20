@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="51802678d1a24f46943c8c556054258f" Name="Diagram1" ZoomLevel="100">
+        <EntityTypeShape EntityType="rainbowwineModel.C__MigrationHistory" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.AppLogApi" Width="1.5" PointX="5.75" PointY="7.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.AppLog" Width="1.5" PointX="7.75" PointY="7.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.AppLogsCashFreeHook" Width="1.5" PointX="9.75" PointY="7.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.AppLogsPaytmHook" Width="1.5" PointX="10.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.AspNetRole" Width="1.5" PointX="3" PointY="65.25" />
+        <EntityTypeShape EntityType="rainbowwineModel.AspNetUserClaim" Width="1.5" PointX="7.5" PointY="63.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.AspNetUserLogin" Width="1.5" PointX="7.5" PointY="66.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.AspNetUser" Width="1.5" PointX="5.25" PointY="63.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.Banner" Width="1.5" PointX="5.75" PointY="10.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CallbackPushApi" Width="1.5" PointX="11.75" PointY="5.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CancelOption" Width="1.5" PointX="11.75" PointY="10.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CashFreePay" Width="1.5" PointX="12.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CashFreeRefund" Width="1.5" PointX="7.75" PointY="12.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.Customer" Width="1.5" PointX="6.75" PointY="28.25" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerAddress" Width="1.5" PointX="3" PointY="39" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerContact" Width="1.5" PointX="13.75" PointY="4.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerEmailSend" Width="1.5" PointX="13.75" PointY="8.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerEta" Width="1.5" PointX="9.75" PointY="13.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerOTPVerify" Width="1.5" PointX="13.75" PointY="11.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerPayPin" Width="1.5" PointX="14.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.CustomerSMSSend" Width="1.5" PointX="3.75" PointY="14.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryAgentLogin" Width="1.5" PointX="7.5" PointY="69.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryAgent" Width="1.5" PointX="5.25" PointY="51.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryAgentTime" Width="1.5" PointX="15.75" PointY="4.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryAgentTrack" Width="1.5" PointX="15.75" PointY="7.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryBackToStore" Width="1.5" PointX="11.25" PointY="43" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryHour" Width="1.5" PointX="15.75" PointY="10.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryJob" Width="1.5" PointX="11.75" PointY="15.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryPayment" Width="1.5" PointX="11.25" PointY="29.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliverySlot" Width="1.5" PointX="3" PointY="54.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryZone" Width="1.5" PointX="3" PointY="74.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.DelManageShop" Width="1.5" PointX="15.75" PointY="13.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DiscountMaster" Width="1.5" PointX="16.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.DiscountProduct" Width="1.5" PointX="3" PointY="7.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.DumpRoutePlan" Width="1.5" PointX="14.25" PointY="41" />
+        <EntityTypeShape EntityType="rainbowwineModel.Favorite" Width="1.5" PointX="5.75" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.FcmUser" Width="1.5" PointX="7.75" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.Inventory" Width="1.5" PointX="6" PointY="34.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.InventoryMixer" Width="1.5" PointX="3" PointY="34.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.InventoryTMP" Width="1.5" PointX="13.75" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.InventoryTrack" Width="1.5" PointX="15.75" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.MerchantTran" Width="1.5" PointX="0.75" PointY="4.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.Mixer" Width="1.5" PointX="1.5" PointY="49.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerSize" Width="1.5" PointX="1.5" PointY="47.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.NewsLetter" Width="1.5" PointX="17.75" PointY="3.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.NotificationType" Width="1.5" PointX="0.75" PointY="1.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.Notify" Width="1.5" PointX="3" PointY="1" />
+        <EntityTypeShape EntityType="rainbowwineModel.NotifyHandle" Width="1.5" PointX="17.75" PointY="6.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.NotifyOrder" Width="1.5" PointX="5.25" PointY="1" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderDetail" Width="1.5" PointX="3" PointY="30.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderDetailModify" Width="1.5" PointX="3" PointY="67.625" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderDetailModifyOriginal" Width="1.5" PointX="3" PointY="77.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderIssue" Width="1.5" PointX="14.25" PointY="34.125" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderIssueDetail" Width="1.5" PointX="16.5" PointY="34.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderIssueDetailOriginal" Width="1.5" PointX="3" PointY="23.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderIssueTicket" Width="1.5" PointX="16.5" PointY="38.625" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderIssueTrack" Width="1.5" PointX="17.75" PointY="9.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderIssueType" Width="1.5" PointX="12" PointY="27.125" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderModify" Width="1.5" PointX="17.75" PointY="13.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderModifyTrack" Width="1.5" PointX="17.75" PointY="17.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.Order" Width="1.5" PointX="9" PointY="32" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderStatu" Width="1.5" PointX="6.75" PointY="38.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.OrderTrack" Width="1.5" PointX="9" PointY="47.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.PayLink" Width="1.5" PointX="11.25" PointY="39.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.PaymentCashFreeLog" Width="1.5" PointX="19.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PaymentLinkLog" Width="1.5" PointX="19.75" PointY="5.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PaymentRefund" Width="1.5" PointX="9.75" PointY="19.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PaymentType" Width="1.5" PointX="3.75" PointY="19.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PremiumProductRecomm" Width="1.5" PointX="19.75" PointY="10.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PriceRange" Width="1.5" PointX="19.75" PointY="13.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.Product" Width="1.5" PointX="1.5" PointY="19.25" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductBarcodeLink" Width="1.5" PointX="19.75" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductBrand" Width="1.5" PointX="1.5" PointY="15.25" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductCategory" Width="1.5" PointX="1.5" PointY="11.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductCategoryLink" Width="1.5" PointX="19.75" PointY="19.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductDetail" Width="1.5" PointX="0.75" PointY="24.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductLog" Width="1.5" PointX="5.75" PointY="20.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductNotThere" Width="1.5" PointX="11.75" PointY="20.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductRecom" Width="1.5" PointX="13.75" PointY="20.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductRecomCustomer" Width="1.5" PointX="21.75" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductSearch" Width="1.5" PointX="21.75" PointY="3.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ProductSize" Width="1.5" PointX="21.75" PointY="7.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.Rating" Width="1.5" PointX="14.25" PointY="29.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.RatingOption" Width="1.5" PointX="8" PointY="4.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.RatingProductReview" Width="1.5" PointX="21.75" PointY="10.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.RatingReview" Width="1.5" PointX="9" PointY="28.25" />
+        <EntityTypeShape EntityType="rainbowwineModel.RatingStar" Width="1.5" PointX="5.75" PointY="4.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.RoutePlan" Width="1.5" PointX="11.25" PointY="46.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.RUser" Width="1.5" PointX="7.5" PointY="43.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.ShopMerchant" Width="1.5" PointX="3" PointY="5" />
+        <EntityTypeShape EntityType="rainbowwineModel.TravelMode" Width="1.5" PointX="21.75" PointY="13.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.UserRefreshToken" Width="1.5" PointX="15.75" PointY="21.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.UserType" Width="1.5" PointX="5.25" PointY="42.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.WineShop" Width="1.5" PointX="0.75" PointY="32.375" />
+        <EntityTypeShape EntityType="rainbowwineModel.InventoryDetail" Width="1.5" PointX="3" PointY="59.625" />
+        <AssociationConnector Association="rainbowwineModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="rainbowwineModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="rainbowwineModel.FK_RUser_AspNetUsers" />
+        <AssociationConnector Association="rainbowwineModel.FK_CustomerAddress_Customer" />
+        <AssociationConnector Association="rainbowwineModel.FK_CustomerOrder" />
+        <AssociationConnector Association="rainbowwineModel.FK_DumpRoutePlan_Customer" />
+        <AssociationConnector Association="rainbowwineModel.FK_Rating_Customer" />
+        <AssociationConnector Association="rainbowwineModel.FK_RatingReview_Customer" />
+        <AssociationConnector Association="rainbowwineModel.FK_RoutePlan_Customer" />
+        <AssociationConnector Association="rainbowwineModel.FK_CustomerAddress_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryAgentLogin_DeliveryAgents" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryAgents_DeliverySlots" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryAgents_DeliveryZones" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryAgents_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_DumpRoutePlan_DeliveryAgents" />
+        <AssociationConnector Association="rainbowwineModel.FK_RoutePlan_DeliveryAgents" />
+        <AssociationConnector Association="rainbowwineModel.FK_RUser_DeliveryAgents" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryBackToStore_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryPayment_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_DeliveryZones_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_DiscountProduct_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_DumpRoutePlan_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_DumpRoutePlan_OrderStatus" />
+        <AssociationConnector Association="rainbowwineModel.FK_DumpRoutePlan_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_Inventory_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_Inventory_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK__Inventory__ShopI__5C37ACAD" />
+        <AssociationConnector Association="rainbowwineModel.FK_ShopMerchant_MerchantTrans" />
+        <AssociationConnector Association="rainbowwineModel.FK_Notify_NotificationType" />
+        <AssociationConnector Association="rainbowwineModel.FK_NotifyOrder_Notify" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderDetail_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderDetail_ProductDetails1" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderDetail_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderDetailModify_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderDetailModifyOriginal_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssue_OrderIssueType" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssue_OrderIssueType1" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssue_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssueDetail_OrderIssue" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssueTicket_OrderIssue" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssueDetail_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssueDetail_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderIssueDetailOriginal_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_Orders_OrderStatus" />
+        <AssociationConnector Association="rainbowwineModel.FK_Orders_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_PayLink_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_RoutePlan_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderTrack_OrderStatus" />
+        <AssociationConnector Association="rainbowwineModel.FK_RoutePlan_OrderStatus" />
+        <AssociationConnector Association="rainbowwineModel.FK_Product_ProductBrand" />
+        <AssociationConnector Association="rainbowwineModel.FK_Product_ProductCategory" />
+        <AssociationConnector Association="rainbowwineModel.FK_ProductDetails_Product" />
+        <AssociationConnector Association="rainbowwineModel.FK_Rating_RatingReview" />
+        <AssociationConnector Association="rainbowwineModel.FK_RatingOption_RatingStar" />
+        <AssociationConnector Association="rainbowwineModel.FK_RoutePlan_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_RUser_UserType" />
+        <AssociationConnector Association="rainbowwineModel.FK_RUser_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK_InventoryDetails_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.AspNetUserRoles" />
+        <EntityTypeShape EntityType="rainbowwineModel.Supplier" Width="1.5" PointX="22.375" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerOrderItem" Width="1.5" PointX="11.25" PointY="34.75" />
+        <AssociationConnector Association="rainbowwineModel.FK_MixerOrderItem_Orders" />
+        <AssociationConnector Association="rainbowwineModel.FK_MixerOrderItem_WineShop" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerOrde__Suppl__52442E1F" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerDetail" Width="1.5" PointX="3.75" PointY="44.625" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerDeta__Mixer__618671AF" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerDeta__Mixer__627A95E8" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerOrde__Mixer__57FD0775" />
+        <AssociationConnector Association="rainbowwineModel.FK_InventoryMixer_MixerDetail" />
+        <AssociationConnector Association="rainbowwineModel.FK_InventoryMixer_Supplier" />
+        <EntityTypeShape EntityType="rainbowwineModel.Page" Width="1.5" PointX="5.375" PointY="23.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PageButton" Width="1.5" PointX="12.375" PointY="23.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PageContent" Width="1.5" PointX="24.375" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PageImage" Width="1.5" PointX="24.375" PointY="3.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PageVersion" Width="1.5" PointX="24.375" PointY="6.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.PromoApply" Width="1.5" PointX="22.875" PointY="23.5" />
+        <EntityTypeShape EntityType="rainbowwineModel.PromoCode" Width="1.5" PointX="20.625" PointY="23" />
+        <EntityTypeShape EntityType="rainbowwineModel.PromoType" Width="1.5" PointX="18.375" PointY="23.75" />
+        <AssociationConnector Association="rainbowwineModel.FK_OrderDetail_PromoCode" />
+        <AssociationConnector Association="rainbowwineModel.FK_Orders_PromoCode" />
+        <AssociationConnector Association="rainbowwineModel.FK_PromoApply_PromoCode" />
+        <AssociationConnector Association="rainbowwineModel.FK_PromoCode_PromoType" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryEarning" Width="1.5" PointX="24.375" PointY="9.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ReferralCommission" Width="1.5" PointX="24.375" PointY="13.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ReferralType" Width="1.5" PointX="14.375" PointY="24.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.ReferralUser" Width="1.5" PointX="24.375" PointY="16.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerBarcodeLink" Width="1.5" PointX="24.375" PointY="19.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerProductLink" Width="1.5" PointX="6.75" PointY="47.75" />
+        <AssociationConnector Association="rainbowwineModel.FK_MixerProductLink_Mixer" />
+        <AssociationConnector Association="rainbowwineModel.FK_MixerProductLink_ProductDetails" />
+        <AssociationConnector Association="rainbowwineModel.FK_MixerProductLink_WineShop" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerIssueDetail" Width="1.5" PointX="19.5" PointY="39.875" />
+        <EntityTypeShape EntityType="rainbowwineModel.MixerIssueDetailOriginal" Width="1.5" PointX="16.5" PointY="42.875" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerIssu__Mixer__3CA9F2BB" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerIssu__Mixer__3D9E16F4" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerIssu__Order__3E923B2D" />
+        <AssociationConnector Association="rainbowwineModel.FK__MixerIssu__Order__3F865F66" />
+        <EntityTypeShape EntityType="rainbowwineModel.DeliveryAgentType" Width="1.5" PointX="25.375" PointY="23" />
+        <EntityTypeShape EntityType="rainbowwineModel.WeekDay" Width="1.5" PointX="7.375" PointY="25.75" />
+        <AssociationConnector Association="rainbowwineModel.FK__DeliveryA__Deliv__64B7E415" />
+        <EntityTypeShape EntityType="rainbowwineModel.GiftBagDetail" Width="1.5" PointX="26.375" PointY="0.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.GiftBagInventory" Width="1.5" PointX="26.375" PointY="4.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.GiftBagMaster" Width="1.5" PointX="26.375" PointY="8.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.GiftBagOrderItemIssueDetail" Width="1.5" PointX="26.375" PointY="11.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.GiftBagOrderItemIssueDetailOriginal" Width="1.5" PointX="26.375" PointY="15.75" />
+        <EntityTypeShape EntityType="rainbowwineModel.GiftBagOrderItem" Width="1.5" PointX="16.375" PointY="26.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

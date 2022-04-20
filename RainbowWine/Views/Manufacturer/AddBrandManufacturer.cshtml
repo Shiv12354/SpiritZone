@@ -1,0 +1,112 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.BrandManufacturerDO>
+
+<h2>Add New Brand Manufacturer</h2>
+<div>
+    <br />
+    <div>
+        <b>Manufacturer</b>
+        <select id="NotLinkBrandManufacturerlistId" size="10" required=required name="NotLinkBrandManufacturerlistlist">
+            @if (ViewBag.NotLinkBrandManufacturerList != null)
+            {
+                foreach (var item in ViewBag.NotLinkBrandManufacturerList)
+                {
+                    if (item.Text != null)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+
+                    }
+
+                }
+
+            }
+        </select>
+        <b>Brands</b>
+        <select id="BrandManufacturerlistId" multiple="multiple" required=required name="BrandManufacturerlist">
+            @if (ViewBag.AllBrandManufacturerList != null)
+            {
+                foreach (var item in ViewBag.AllBrandManufacturerList)
+                {
+                    if (item.Text != null)
+                    {
+                        <option value="@item.Value">
+                            @item.Text
+                        </option>
+
+                    }
+                }
+            }
+        </select>
+    </div>
+    
+</div>
+<br />
+<br />
+<button id="btnSave">Save</button>
+
+
+@section scripts{
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js">
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $("#NotLinkBrandManufacturerlistId").select2({
+                placeholder: '--Select Manufacturer--',
+                width: '20%',
+                theme: "classic"
+            });
+        });
+
+        $(function () {
+            $("#BrandManufacturerlistId").select2({
+                placeholder: '--Select Brands--',
+                closeOnSelect: false,
+                width: '50%',
+            });
+        });
+
+    </script>
+
+    <script>
+
+        $('#btnSave').on('click', function () {
+            var Manufacturer = $("#NotLinkBrandManufacturerlistId option:selected");
+            var selected = $("#BrandManufacturerlistId option:selected");    /*Current Selected Value*/
+            var message = "";
+            var arrManufacturer = [];      /*Array to store multiple values in stack*/
+            Manufacturer.each(function () {
+                arrManufacturer.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+
+            });
+
+            var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                arrSelected.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+
+            });
+
+
+            if (arrManufacturer == null || arrManufacturer == "") {
+                alert("Please select Manufacturer");
+                return false;
+            }
+
+            if (arrSelected == null || arrSelected == "") {
+                alert("Please select Brands");
+                return false;
+            }
+            $.post(
+                '/Manufacturer/AddNewBrandManufacturer/',
+                { manufacturerId: arrManufacturer, brandIds: arrSelected, action: "AddNewEntry" },
+                function (item) {
+                    alert("New Brand Added With Manufacturer Successfully");
+                    window.location.reload();
+                }, "json");
+        });
+    </script>
+}

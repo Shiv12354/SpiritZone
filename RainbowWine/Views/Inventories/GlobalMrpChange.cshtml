@@ -1,0 +1,173 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.GlobalMrpChange>
+@{
+    ViewBag.Title = "List";
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.FirstLast);
+
+}
+
+<h2>GLOBAL MRP CHANGE</h2>
+<p>
+    <div style="width:500px;">
+        <input type="text" placeholder="Product Name" id="txtProductSearch" value="@ViewBag.ProductName" />
+        <button id="btnSearch">Search</button>
+    </div>
+</p>
+
+<div>
+
+    <select id="myCountries" multiple="multiple" required=required name="myCountries">
+       
+        @if (ViewBag.ShopList != null)
+        {
+            foreach (var item in ViewBag.ShopList)
+            {
+                if (item.Text != null)
+                {
+                    <option value="@item.Value">
+                        @item.Text
+                    </option>
+
+                }
+            }
+        }
+    </select>
+</div>
+
+
+@if (Model != null && Model.Count() > 0)
+{
+    <div>
+        @grid.GetHtml(tableStyle: "table",
+                        headerStyle: "",
+                        alternatingRowStyle: "alt",
+                        selectedRowStyle: "select",
+                        htmlAttributes: new { @id = "WebGrid" },
+                        columns: grid.Columns(
+
+    grid.Column("Id",
+    format:@<text>
+            @Html.ActionLink(((int)item.ProductID).ToString(), "Edit", new { id = item.ProductID })
+    </text>),
+grid.Column("Product Name", style: "col3",
+format:@<text>
+            @Html.Label((string)item.ProductName, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("MRP", style: "col7",
+format:@<text>
+            @Html.Label(((double)item.MRP).ToString(), new { @class = "display-mode", @id = "MRP" })
+            @Html.TextBox("MRP-Edit", ((double)item.MRP).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+</text>
+),
+grid.Column("Action", style: "col8",
+
+format: @<text><div style="padding-left:20px;">
+                <button class="btn btn-default edit-item display-mode " id="@item.ProductID">Edit</button>
+                @Html.ActionLink("Delete", "Delete", new { id = item.ProductID }, new { @class = "btn btn-default display-mode " })
+                @*<button class="btn_grid display-mode delete-item" id="@item.ProductID">Delete</button>*@
+                <button class="btn btn-default save-item edit-mode" id="@item.ProductID">Save</button>
+                <button class="btn btn-default cancel-item edit-mode" id="@item.ProductID">Cancel</button>
+            </div>
+</text>)
+)
+)
+
+    </div>
+}
+else
+{
+    <h3>No Data</h3>
+}
+
+@section scripts{
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/js/bootstrap-multiselect.min.js" integrity="sha512-ljeReA8Eplz6P7m1hwWa+XdPmhawNmo9I0/qyZANCCFvZ845anQE+35TuZl9+velym0TKanM2DXVLxSJLLpQWw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.16/css/bootstrap-multiselect.css" integrity="sha512-DJ1SGx61zfspL2OycyUiXuLtxNqA3GxsXNinUX3AnvnwxbZ+YQxBARtX8G/zHvWRG9aFZz+C7HxcWMB0+heo3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        $(function () {
+            $('#myCountries').multiselect({
+                includeSelectAllOption: true,         /*To enable the Select all Option*/
+                selectAllValue: 'multiselect-all',     /*The value used for the select all option can be configured using the selectAllValue*/
+                enableFiltering: true,   /*A filter input will be added to dynamically filter all the options*/
+                enableCaseInsensitiveFiltering: true,  /*To enable Case Insenstitive Filtering (Upper and Lower Case Letters)*/
+                maxHeight: '300',
+                buttonWidth: '300',
+            });
+        });
+    </script>
+    <script>
+        $("#txtProductSearch").autocomplete({
+
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchProductMaster",
+                    data: {
+                        text: request.term, shopId: 12
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                //console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " price " + ui.item.price + " Id " + ui.item.Id);
+            }
+        });
+
+    </script>
+    <script>
+        $('#btnSearch').click(function () {
+            var product = $('#txtProductSearch').val();
+            if (product != '') {
+                window.location = "/Inventories/GlobalMrpChange?product=" + product;
+            }
+        })
+    </script>
+    <script>
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            $('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            var ProductID = $(this).prop('id');
+            var selected = $("#myCountries option:selected");    /*Current Selected Value*/
+            var message = "";
+            var arrSelected = [];      /*Array to store multiple values in stack*/
+            selected.each(function () {
+                arrSelected.push($(this).val());    /*Stack the Value*/
+                message += $(this).text() + " " + $(this).val() + "\n";
+            });
+            if (arrSelected == null || arrSelected == "") {
+                alert("Please select shop from dropdown");
+                return false;
+            }
+            var MRP = tr.find('#MRP-Edit').val();
+            $.post(
+                '/Inventories/UpdateGlobalMrp/',
+                { ProductID: ProductID, ShopIds: arrSelected, MRP: MRP },
+                function (item) {
+                    alert("Mrp Updated Successfully");
+                    window.location.reload();
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+    </script>
+
+}

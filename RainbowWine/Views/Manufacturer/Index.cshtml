@@ -1,0 +1,193 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<RainbowWine.Services.DO.ManufacturerDO>
+@*@model IEnumerable<RainbowWine.Services.DO.ManufacturerDO>*@
+@{
+    ViewBag.Title = "Manufacturer";
+
+}
+
+<h2>Manufacturer</h2>
+<div id='Paging' style="text-align:center">
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+
+</div>
+<p></p>
+
+<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+    <thead class="bg-success">
+        <tr>
+            <th>
+                Manufacturer Name
+            </th>
+            <th>
+                Manufacturer Abbreviated
+            </th>
+            <th>
+                Region
+            </th>
+            <th>
+                CollabSince
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    @foreach (var item in Model)
+    {
+        <tbody>
+            <tr>
+                <td>
+                    @Html.Label(item.ManufacturerName.ToString(), new { @class = "display-mode", @id = "txtManufacturerNameId" })
+                    @Html.TextBox("ManufacturerName-Edit", item.ManufacturerName.ToString(), new { @class = "edit-mode", style = "width: 150px;" })
+
+                </td>
+                <td>
+                    @Html.Label(item.ManufacturerAbbreviated.ToString(), new { @class = "display-mode", @id = "txtManufacturerAbbreviatedId" })
+                    @Html.TextBox("ManufacturerAbbreviated-Edit", item.ManufacturerAbbreviated.ToString(), new { @class = "edit-mode", style = "width: 150px;" })
+
+                </td>
+                <td>
+                    @Html.Label(item.Region.ToString(), new { @class = "display-mode", @id = "txtRegionId" })
+                    @Html.TextBox("Region-Edit", item.Region.ToString(), new { @class = "edit-mode", style = "width: 150px;" })
+
+                </td>
+                <td>
+                    @Html.Label(item.CollabSince.ToString(), new { @class = "display-mode", @id = "txtCollabSinceId" })
+                    @Html.TextBox("CollabSince-Edit", item.CollabSince.ToString(), new { @class = "edit-mode", style = "width: 150px;" })
+
+                </td>
+                <td>
+                    <button class="btn_grid edit-item display-mode" id="@item.ManufacturerId">Edit</button>
+                    <button class="btn_grid delete-item display-mode" id="@item.ManufacturerId">Delete</button>
+                    <button class="btn_grid save-item edit-mode" id="@item.ManufacturerId">Save</button>
+                    <button class="btn_grid cancel-item edit-mode" id="@item.ManufacturerId">Cancel</button>
+                </td>
+            </tr>
+        </tbody>
+    }
+
+</table>
+
+<div>
+    <table class="table table-bordered" width="100%" cellspacing="0">
+        <tr>
+            <td><input type="text" placeholder="Manufacturer Name" id="txtAddManufacturerName" /></td>
+            <td><input type="text" placeholder="Manufacturer Abbreviated" id="txtAddManufacturerAbbreviated" /></td>
+            <td> <input type="text" placeholder="Region" id="txtAddRegion" /></td>
+            <td> <input type="text" placeholder="CollabSince" id="txtAddCollabSince" /></td>
+            <td> <button id="btnAdd" class="display-mode">Add</button></td>
+        </tr>
+    </table>
+</div>
+
+<p>@Html.ActionLink("Back To Competitor", "ProductCompetitorLinkList", "Orders")</p>
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $('#btnAdd').click(function () {
+            var manufacturerName = $('#txtAddManufacturerName').val();
+            var manufacturerAbbreviated = $('#txtAddManufacturerAbbreviated').val();
+            var region = $('#txtAddRegion').val();
+            var collabSince = $('#txtAddCollabSince').val();
+
+            var prodId = $(this).attr('data-prod');
+            console.log(prodId);
+            if (manufacturerName == undefined || manufacturerName == '') { alert('Please enter manufacturerName') }
+            else if (manufacturerAbbreviated == undefined || manufacturerAbbreviated == '') { alert('Please enter manufacturerAbbreviated') }
+            else if (region == undefined || region == '') { alert('Please enter region') }
+            else {
+                if (confirm("Are you sure  you want to save manufacturer.")) {
+                    $.post(
+                        '/Manufacturer/AddManufacturer/',
+                        { manufacturerName: manufacturerName, manufacturerAbbreviated: manufacturerAbbreviated, region: region, collabSince: collabSince },
+                        function (item) {
+                            if (item != undefined) {
+                                if (item.response == 3) {
+                                    alert('Manufacturer name is already exist.');
+                                }
+                                else if (item.status) {
+                                    window.location.reload();
+                                }
+                                else {
+                                    alert('Unable to add manufacturerName.');
+                                }
+                            }
+                        }, "json");
+                }
+            }
+
+        });
+
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            //$('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            //console.log("DD");
+            var tr = $(this).parents('tr:first');
+            var id = $(this).prop('id');
+            var manufacturerName = tr.find('#ManufacturerName-Edit').val();
+            var manufacturerAbbreviated = tr.find('#ManufacturerAbbreviated-Edit').val();
+            var region = tr.find('#Region-Edit').val();
+            var collabSince = tr.find('#CollabSince-Edit').val();
+            if (confirm("Are you sure  you want to update manufacturer.")) {
+                $.post(
+                    '/Manufacturer/UpdateManufacturer/',
+                    { manufacturerId: id, manufacturerName: manufacturerName, manufacturerAbbreviated: manufacturerAbbreviated, region: region, collabSince: collabSince },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.response == 3) {
+                                alert('Manufacturer name is already exist.');
+                            }
+                            else if (item.status) {
+                                window.location.reload();
+                            }
+                            else {
+                                alert('Unable to update the Manufacturer.');
+                            }
+                        }
+                    }, "json");
+                tr.find('.edit-mode, .display-mode').toggle();
+            }
+        });
+
+        $('.delete-item').on('click', function () {
+            if (confirm('Are you sure do you want to delete it?')) {
+                //console.log("DD");
+                var tr = $(this).parents('tr:first');
+                var id = $(this).prop('id');
+                var barcode = tr.find('#BarcodeId-Edit').val();
+                $.post(
+                    '/Manufacturer/DeleteManufacturer/',
+                    { manufacturerId: id },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.status)
+                                window.location.reload();
+                            else
+                                alert('Unable to delete the barcode.');
+                        }
+                    }, "json");
+            }
+        });
+    </script>
+    <script language="javascript">
+        $(function () {
+            $('#choose').pagination({
+                items: 20,
+                itemsOnPage: 2,
+                cssStyle: 'light-theme',
+                onPageClick: function (pageNumber) { test(pageNumber) }
+            });
+        });
+    </script>
+}

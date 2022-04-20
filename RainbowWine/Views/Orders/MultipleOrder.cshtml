@@ -1,0 +1,303 @@
+﻿@model IEnumerable<RainbowWine.Data.Order>
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Index";
+    string userType = ViewBag.UserType as string;
+    bool logonly = (string.Compare(User.Identity.GetUserName(), "cash1@rainmail.com", true) == 0);
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $("#txtShopSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchShop",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                var sid = ui.item.Id;
+                $('#dpShopId').val(sid).attr("selected", "selected");
+            }
+        });
+        $("#txtStatusSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchStatus",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                var sid = ui.item.Id;
+                $('#dpStatusId').val(sid).attr("selected", "selected");
+            }
+        });
+        $("#txtOrderSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchOrder",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+        $("#txtContactSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchCustNumber",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+        $('#btnSearch').click(function () {
+            var shopid = $('#dpShopId').val();
+            var shopname = $('#txtShopSearch').val();
+            var statusid = $('#dpStatusId').val();
+            var statusname = $('#txtStatusSearch').val();
+            var soid = $('#txtOrderSearch').val();
+            var custno = $('#txtContactSearch').val();
+            console.log(shopid + " | " + statusid);
+            window.location = "/orders/multipleorder?shopId=" + shopid + "&shopname=" + shopname + "&statusId=" + statusid + "&statusname=" + statusname + "&soid=" + soid + "&custno=" + custno;
+
+        })
+        $('#btnBulkResend').click(function () {
+            var bulkDate = $('#txtBukDate').val();
+
+            if (bulkDate != '') {
+                $.post("/orders/ReSendBulkPaytmLink",
+                    { "id": id },
+                    function (data) {
+                        console.log(data);
+                        if (data.status == '0') {
+                            alert("Resend link send successfully.");
+                        }
+                        else if (data.status == '1') {
+                            alert("There is no such Order.");
+                        }
+                        else if (data.status == '2') {
+                            alert("Paytm payment link not yet generated.");
+                        }
+                        else if (data.status == '3') {
+                            alert("Max limit cross resend link.");
+                        }
+                    }
+                );
+            }
+        })
+        function resendlink(id) {
+            if (id > 0) {
+                $.post("/orders/ReSendPaytmLink",
+                    { "id": id },
+                    function (data) {
+                        console.log(data);
+                        if (data.status == '1') {
+                            alert("There is no such Order.");
+                        }
+                        else if (data.status == '2') {
+                            alert("Paytm payment link not yet generated.");
+                        }
+                        else if (data.status == '3') {
+                            alert("Max limit cross resend link.");
+                        }
+                    }
+                );
+                return false;
+            }
+        }
+        function reassignvalidate(id) {
+            if (confirm("Are you sure do you want to reassign the order.") == true) {
+
+                console.log(id);
+                $('#frmReassign' + id).submit();
+                return false;
+            }
+            return false;
+        }
+        function refundvalid(id) {
+            if (confirm("Are you sure do you want to refund the order amount.") == true) {
+
+                console.log(id);
+                $('#frmRefund' + id).submit();
+                return false;
+            }
+            return false;
+        }
+    </script>
+}
+<h2>Orders</h2>
+@if (Model == null)
+{
+    <p>No Records</p>
+    <p>@TempData["msg"]</p>
+}
+else {
+<table border="0" cellpadding="1" cellspacing="1">
+    <tr>
+        @if (userType.ToLower() == "shopper")
+        {
+            <td>
+                <input type="text" placeholder="Shop Name" id="txtShopSearch" value="@ViewBag.ShopName" />
+                @Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)@ViewBag.ShopId, "Select Shop", htmlAttributes: new { @class = "form-control", @id = "dpShopId", @style = "display:none;" })
+            </td>
+        }
+        @if (userType.ToLower() == "shopper" || userType.ToLower() == "packer" || userType.ToLower() == "deliverymanager")
+        {
+            <td>
+                <input type="text" placeholder="Status" id="txtStatusSearch" value="@ViewBag.StatusName" />
+                @Html.DropDownList("dpStatusId", (IEnumerable<SelectListItem>)@ViewBag.StatusId, "Select Status", htmlAttributes: new { @class = "form-control", @id = "dpStatusId", @style = "display:none;" })
+            </td>
+        }
+        <td>
+            <input type="text" placeholder="Order Id" id="txtOrderSearch" value="@(ViewBag.soid==0?"":ViewBag.soid)" />
+        </td>
+        <td>
+            <input type="text" placeholder="Contact No" id="txtContactSearch" value="@(string.IsNullOrWhiteSpace(ViewBag.CustNo)?"":ViewBag.CustNo)" />
+        </td>
+        <td>
+            <button id="btnSearch"> Search</button>
+        </td>
+    </tr>
+</table>
+
+<table class="table">
+    <tr>
+        <th>
+            Order No
+        </th>
+        <th>
+            Order Gorup No
+        </th>
+        <th>
+            Time/Date
+        </th>
+        <th>
+            AgentName
+        </th>
+        <th>
+            Customer Contact No.
+        </th>
+        <th>
+            Order Amount
+        </th>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Shop
+        </th>
+        <th>
+            Status
+        </th>
+        <th>
+            Payment Type
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderGroupId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderPlacedBy)
+            </td>
+            <td>
+                @Convert.ToInt64(item.OrderTo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.CustomerName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WineShop.ShopName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderStatu.OrderStatusName)
+            </td>
+            <td>
+                @(((item.PaymentTypeId == 2 || (item.PaymentTypeId == 4) ? "Postpaid" : "Prepaid")))
+            </td>
+            <td>
+                @if (userType.ToLower() == "shopper")
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })
+                    @(" ")
+                    @Html.ActionLink("Track", "History", new { id = item.Id })
+                }
+                @if (userType.ToLower() == "packer")
+                {
+                    @Html.ActionLink("Details", "Pack", new { id = item.Id })
+                }
+                else
+                {
+                    @Html.RouteLink("Details", "GetMultipeOrderDetail", new { orderId = item.Id })
+                }
+            </td>
+        </tr>
+    }
+    @if (Model.Count() <= 0)
+    {
+        <tr>
+            <td colspan="10">
+                No Record Found.
+            </td>
+        </tr>
+    }
+</table>
+}

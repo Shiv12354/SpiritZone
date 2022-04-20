@@ -1,0 +1,172 @@
+﻿@model RainbowWine.Models.OrderDetailsView
+@{
+    Layout = null;
+
+    double permitAmt = Convert.ToDouble(System.Configuration.ConfigurationManager.AppSettings["PremitValue"]);//premit amount
+}
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <link href="~/Content/invoice2.css" rel="stylesheet" />
+    </head>
+    <body>
+
+        <div id="invoice">
+
+            <div class="invoice overflow-auto">
+                <div style="width:100%;">
+                    <header>
+                        <div class="row">
+
+                            <div class="col company-details">
+
+                                <div>Lic No. @Html.DisplayFor(model => model.Ord.WineShop.LicNo)</div>
+                                <div>@Html.DisplayFor(model => model.Ord.WineShop.CLNo)</div>
+
+                            </div>
+                            <div class="col text-right">
+                                <a target="_blank" href="#">
+                                    <img src="~/Content/images/logobill.png" data-holder-rendered="true" />
+                                </a>
+                            </div>
+                        </div>
+
+                    </header>
+
+                    <main>
+                        <div class="row">
+                            <div class="col text-center">
+                                <h2 class="logo-font">@Html.DisplayFor(model => model.Ord.WineShop.ShopName)</h2>
+                                <div class="address">
+                                    @Html.DisplayFor(model => model.Ord.WineShop.Address)<br>
+                                    <strong>Tel.: @Html.DisplayFor(model => model.Ord.WineShop.PhoneNo)</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mob-center">
+                            <div class="col">
+                                <div class="text-gray-light">Order No. <span>@Html.DisplayFor(model => model.Ord.Id)</span></div>
+                                <div class="address">
+                                    Name : @Html.DisplayFor(model => model.Ord.Customer.CustomerName)<br>
+                                    @*<strong>Mobile : @Html.DisplayFor(model => model.Ord.OrderTo)</strong>*@
+                                </div>
+                            </div>
+                            <div class="col text-right">
+                                <div class="date">Date : @Model.Ord.OrderDate.ToString("dd-MM-yyyy")</div>
+                                <div class=""><strong>Lic Permit No.: @Html.DisplayFor(model => model.Ord.LicPermitNo)</strong></div>
+                            </div>
+                        </div>
+                        <div class="table-100">
+                            <table border="0" cellspacing="0" cellpadding="0">
+                                <thead>
+                                    <tr>
+                                        <th><b>Serial No.</b></th>
+                                        <th class="text-center"><b>Particulars</b></th>
+                                        <th class="text-center">MI.</th>
+                                        <th class="text-center">Qty.</th>
+                                        <th class="text-center">Rate</th>
+                                        <th class="text-center">Discount <br/>%</th>
+                                        <th class="text-center">Discount <br/>Amount</th>
+                                        <th class="text-center">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int srno = 0;
+                                        decimal totalamt = 0;
+                                        int totalqty = 0;
+                                        foreach (var item in Model.CurOrdDetail)
+                                        {
+                                            decimal amt = item.Price * item.ItemQty;
+                                            if ((item.DiscountProductId ?? 0) > 0)
+                                            {
+                                                amt -= Convert.ToDecimal(item.DiscountAmount);
+                                            }
+                                            totalamt = totalamt + amt;
+                                            totalqty = totalqty + item.ItemQty;
+                                            srno = srno + 1;
+                                            <tr>
+                                                <td class="no">@srno</td>
+                                                <td class="text-left partc">
+                                                    @Html.DisplayFor(modelItem => item.ProductDetail.ProductName)
+                                                </td>
+                                                <td class="unit"></td>
+                                                <td class="qty">@Html.DisplayFor(modelItem => item.ItemQty)</td>
+                                                <td class="total">Rs. @Html.DisplayFor(modelItem => item.Price)</td>
+                                                <td class="total">@Html.DisplayFor(modelItem => item.DiscountUnit)</td>
+                                                <td class="total">@Html.DisplayFor(modelItem => item.DiscountAmount)</td>
+                                                <td class="amt">Rs.@amt</td>
+                                            </tr>
+
+                                        }
+                                        foreach (var item in Model.MixerItems)
+                                        {
+                                            decimal amt = Convert.ToDecimal(item.Price) * Convert.ToDecimal(item.ItemQty);
+
+                                            totalamt = totalamt + Convert.ToDecimal(amt);
+                                            totalqty = totalqty + item.ItemQty ?? 0;
+                                            srno = srno + 1;
+                                            <tr>
+                                                <td class="no">@srno</td>
+                                                <td class="text-left partc">
+                                                    @Html.DisplayFor(modelItem => item.MixerDetail.Mixer.MixerName)
+                                                </td>
+                                                <td class="unit"></td>
+                                                <td class="qty">@Html.DisplayFor(modelItem => item.ItemQty)</td>
+                                                <td class="total">Rs. @Html.DisplayFor(modelItem => item.Price)</td>
+                                                <td class="total"></td>
+                                                <td class="total"></td>
+                                                <td class="amt">Rs.@amt</td>
+                                            </tr>
+
+                                        }
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4"></td>
+                                        <td colspan="1">Quantity Total</td>
+                                        <td colspan="2">@totalqty</td>
+                                    </tr>
+                                    @if (string.IsNullOrWhiteSpace(Model.Ord.LicPermitNo))
+                                    {
+                                       
+                                            totalamt += Convert.ToDecimal(permitAmt);
+                                       
+                                        <tr>
+                                            <td colspan="4"></td>
+                                            <td colspan="1">Permit Charge</td>
+                                            <td colspan="2">Rs. @permitAmt</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td colspan="4"></td>
+                                        <td colspan="1"><b>Grand Total</b></td>
+                                        <td colspan="2"><b>Rs. @totalamt</b></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                GSTIN No.: @Html.DisplayFor(model => model.Ord.WineShop.GST)<br>
+                                VAT/ Tin No.: @Html.DisplayFor(model => model.Ord.WineShop.VAT)
+                            </div>
+                            <div class="col text-right font-serif">
+                                <b>For @Html.DisplayFor(model => model.Ord.WineShop.ShopName)</b>
+                            </div>
+                        </div>
+                    </main>
+
+                </div>
+
+                <div></div>
+            </div>
+        </div>
+
+    </body>
+    </html>

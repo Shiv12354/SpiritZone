@@ -1,0 +1,55 @@
+﻿@model IEnumerable<IGrouping<string, RainbowWine.Services.DO.ProductCompetitorLinkDO>>
+@{
+    ViewBag.Title = "Product CompetitorLink List";
+    var Id = 0;
+}
+
+<h2>Product CompetitorLink List</h2>
+<h3>
+    @Html.ActionLink("Manufacturer List", "Index", "Manufacturer") | @Html.ActionLink("Brand Manufacturer List", "BrandManufacturerList", "Manufacturer")
+</h3>
+
+<h4> @Html.ActionLink("Add New Product Competitor", "AddProductCompetitorLink")</h4>
+<table class="table-bordered" width="100%" cellspacing="0">
+    <thead class="bg-success">
+        <tr>
+            <td>
+                Prduct Name
+            </td>
+
+            <td>
+                Copetitor Product Name
+            </td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    @foreach (var groupingByClassA in Model)
+    {
+        <tbody>
+            <tr>
+                <td>
+                    @groupingByClassA.Key
+
+                </td>
+                <td>
+                    @foreach (var classA in groupingByClassA)
+                    {
+                        <table>
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelitem => classA.CopProductName)
+
+                                </td>
+                            </tr>
+                        </table>
+                        Id = classA.ProductRefID;
+                    }
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "ProductCompetitorLink", new { id = Id })
+                    @(" ")
+                </td>
+            </tr>
+            </tbody>
+            }
+    </table>

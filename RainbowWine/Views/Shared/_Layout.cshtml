@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Spiritzone</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link href="~/Content/gautocomplete.css" rel="stylesheet" />
+    <link rel="stylesheet"
+          href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.1.1/build/styles/default.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400" rel="stylesheet" />
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Spiritzone", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Order</a>
+                            <ul class="dropdown-menu">
+                                @if (ViewBag.UserType == "Agent" || ViewBag.UserType == "SalesManager")
+                                {
+                                    <li>@Html.ActionLink("Order", "create", "CustomerOrder")</li>
+                                    <li>@Html.ActionLink("Scheduled Deliveries", "ScheduledDelivery", "Orders")</li>
+                                }
+                                @if (ViewBag.UserType == "Deliver")
+                                {
+                                    <li>@Html.ActionLink("Packed", "Delivery", "Orders")</li>
+                                    <li>@Html.ActionLink("Delivered", "DeliveryCompleted", "Orders")</li>
+                                }
+                                else if (ViewBag.UserType == "Packer")
+                                {
+                                    <li>@Html.ActionLink("Order List", "PackList", "Orders")</li>
+                                    <li>@Html.ActionLink("Packed", "PackedList", "Orders")</li>
+                                    <li>@Html.ActionLink("Issue", "IssueOrderList", "Orders")</li>
+                                    <li>@Html.ActionLink("Scheduled Deliveries", "GetPackerAllScheduledDelivery", "Orders")</li>
+
+                                }
+                                else if (ViewBag.UserType == "DeliverySubManager" || ViewBag.UserType == "DeliverySupervisor")
+                                {
+                                    <li> @Html.ActionLink("AgentsTrack", "Index", "DelManager") </li>
+                                    <li>@Html.ActionLink("Assignment", "Assignment", "DelManager")</li>
+                                    <li>@Html.ActionLink("Delivered Order", "DeliveredOrder", "DelManager")</li>
+                                    <li>@Html.ActionLink("Daily PODCollection", "DailyPODCashCollection", "Orders")</li>
+                                }
+                                else if (ViewBag.UserType == "OrderFullFillment")
+                                {
+                                    <li>@Html.RouteLink("Issue Order List", "GetIssuesOrders")</li>
+                                    <li>@Html.ActionLink("Mrp Issue", "MrpIssue", "Orders")</li>
+
+                                }
+                                else if (ViewBag.UserType == "Shopper")
+                                {
+                                    <li>@Html.ActionLink("Order List", "Index", "Orders")</li>
+                                    <li>@Html.RouteLink("Issue Order List", "GetIssuesOrders")</li>
+                                    <li>@Html.ActionLink("ProductBarcode", "Index", "ProductBarcode")</li>
+                                    <li>@Html.ActionLink("Scheduled Deliveries", "GetAllScheduledDelivery", "Orders")</li>
+                                }
+                                else if (ViewBag.UserType == "Supplier")
+                                {
+                                    <li>@Html.ActionLink("Order List", "SupplierOrder", "Orders")</li>
+                                }
+                                else
+                                {
+                                    <li>@Html.ActionLink("Order List", "Index", "Orders")</li>
+                                }
+                            </ul>
+                        </li>
+                        if (ViewBag.UserType == "Shopper")
+                        {
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Inventory</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("List", "Index", "Inventories")</li>
+                                    <li>@Html.ActionLink("Shop", "Index", "WineShops")</li>
+                                    <li>@Html.ActionLink("Product", "Index", "ProductDetails")</li>
+                                    <li>@Html.ActionLink("Global Mrp Change", "GlobalMrpChange", "Inventories")</li>
+                                    <li>@Html.ActionLink("Config Master", "ConfigMaster", "Orders")</li>
+                                    <li>@Html.ActionLink("Hand Over", "CashCollectionBackToStore", "Orders")</li>
+                                    @*<li>@Html.ActionLink("Upload Latest File", "FileDetails", "Orders")</li>
+        <li>@Html.ActionLink("Download Latest File", "GetFiles", "Orders")</li>*@
+                                </ul>
+                            </li>
+                        }
+                        if (ViewBag.UserType == "Shopper")
+                        {
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Config Portal</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Config Master", "ConfigMaster", "Orders")</li>
+                                    <li>@Html.ActionLink("Competitors", "ProductCompetitorLinkList", "Orders")</li>
+                                </ul>
+                            </li>
+                        }
+                        if (ViewBag.UserType == "DeliveryManager")
+                        {
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Delivery</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("AgentsTrack", "DelAgentTrack", "DeliveryAgents")</li>
+                                    <li>@Html.ActionLink("Agents", "List", "DeliveryAgents")</li>
+                                    <li>@Html.ActionLink("Route Plan", "ReAssign", "DeliveryAgents")</li>
+                                    <li>@Html.ActionLink("Analytics", "Analytics", "DeliveryAgents")</li>
+                                    <li>@Html.ActionLink("Scheduled Deliveries", "ScheduledDelivery", "Orders")</li>
+                                    <li>@Html.ActionLink("Agent wise penalty", "agentwisepenalty", "DeliveryAgents")</li>
+                                    <li>@Html.ActionLink("Daily PODCollection", "DailyPODCashCollection", "Orders")</li>
+                                </ul>
+                            </li>
+                        }
+                        if (ViewBag.UserType == "SalesManager")
+                        {
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Notify", "Notify", "ProductDetails")</li>
+                                    <li>@Html.ActionLink("Global Mrp Change", "GlobalMrpChange", "Inventories")</li>
+                                    <li>@Html.ActionLink("List", "Index", "Inventories")</li>
+                                </ul>
+                            </li>
+                        }
+                        if (ViewBag.UserType == "ProductAdmin")
+                        {
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product Admin</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Product Admin", "Index", "ProductAdmin")</li>
+                                </ul>
+                            </li>
+                        }
+                        if (ViewBag.UserType == "ShopAdmin")
+                        {
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Shop Admin</a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Shop Admin", "OrderWiseBreakDown", "Orders")</li>
+                                </ul>
+                            </li>
+                        }
+
+                    }
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        @*<footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>*@
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

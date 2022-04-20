@@ -1,0 +1,281 @@
+﻿@model RainbowWine.Models.CustomerViewModel
+
+@{
+    ViewBag.Title = "Create";
+    var error = Request.QueryString["msg"];
+}
+
+<h2>Create</h2>
+@using (Html.BeginForm())
+{@Html.AntiForgeryToken() <div class="form-horizontal">
+    <h4>Order</h4>
+    <hr />
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    <div class="alert-info">@error</div>
+    <div class="form-group">
+        @Html.Label("Contact No", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="hidden" id="customerId" name="customerId" value="@ViewBag.custid" />
+            @*@Html.HiddenFor(model => model.Id, new { htmlAttributes = new { @class = "form-control", @id = "customerId" } })*@
+            @Html.EditorFor(model => model.ContactNo, new { htmlAttributes = new { @class = "form-control", @id = "customerno" } })
+            @Html.ValidationMessageFor(model => model.ContactNo, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Customer Name", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control", @id = "txtCustName" } })
+            @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <div class="autocomplete-input-container">
+                <div class="autocomplete-input">
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @id = "txtFullAddress", @placeholder = "Search Customer Address...", @autocomplete = "off", @role = "combobox" } })
+                    @*<input id="txtFullAddress" placeholder="Autocomplete Stores Fallback Google..." autocomplete="off" role="combobox">*@
+                </div>
+                <ul class="autocomplete-results">
+                </ul>
+            </div>
+            @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @id = "txtFullAddress1" } })
+            @Html.EditorFor(model => model.FormattedAddress, new { htmlAttributes = new { @class = "form-control", @id = "txtFullAddressOriginal", @style = "display:none;" } })
+            @Html.EditorFor(model => model.Latitude, new { htmlAttributes = new { @class = "form-control", @id = "txtLatitude", @style = "display:none;" } })
+            @Html.EditorFor(model => model.Longitude, new { htmlAttributes = new { @class = "form-control", @id = "txtLongitude", @style = "display:none;" } })
+            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Flat/House number", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Flat, new { htmlAttributes = new { @class = "form-control", @id = "txtFlat" } })
+            @Html.ValidationMessageFor(model => model.Flat, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Landmark", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Landmark, new { htmlAttributes = new { @class = "form-control", @id = "txtLandmark" } })
+            @Html.ValidationMessageFor(model => model.Landmark, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Shop", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="hidden" id="txtShopId" name="txtShopId" />
+            <input type="hidden" id="txtZoneId" name="txtZoneId" />
+            <input type="hidden" id="txtPlaceId" name="txtPlaceId" />
+            @*@Html.HiddenFor(model => model.PlaceId, new { htmlAttributes = new { @class = "form-control", @id = "txtPlaceId" } })*@
+            <input type="text" readonly id="txtShopName" name="txtShopName" class="form-control" />
+            <div class="text-danger" id="shoperrormsg">@ViewBag.msg</div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-default" id="butSubmit" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Order List", "Index", "Orders", null, new { @class = "btn btn-default" })
+    @*@Html.ActionLink("Back to List", "Index")*@
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    @*<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNIU38ocYYaNSnoZZHkcuKnRzgYOuI-F8&libraries=places"></script>*@
+    @*<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbYj9djHz9eO5YgXXn_YIrOnhqqcMa1JU&libraries=places"></script>*@
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChzvo4xUMg2TlnhQiCjww2k5qdYnP-C9w&libraries=places&callback"></script>
+    <script src="~/Scripts/gautocomplete.js"></script>
+    <script type="text/javascript">
+        //google.maps.event.addDomListener(window, 'load', function () {
+        //    var inputAddressField = document.getElementById("txtFullAddress1");
+        //    var places = new google.maps.places.autocomplete(inputAddressField);
+        //    google.maps.event.addListener(places, 'place_changed', function () {
+
+        //        $('#shoperrormsg').html('');
+        //        var place = places.getPlace();
+        //        console.log(place)
+        //        var place_id = place.place_id;
+        //        var address = place.formatted_address;
+        //        var latitude = place.geometry.location.lat();
+        //        var longitude = place.geometry.location.lng();
+        //        var mesg = "Address: " + address;
+        //        mesg += "\nLatitude: " + latitude;
+        //        mesg += "\nLongitude: " + longitude;
+        //        mesg += "\place_id: " + place_id;
+        //        //alert(mesg);
+        //        $('#txtPlaceId').attr('value', place_id);
+        //        $('#txtLatitude').attr('value', latitude);
+        //        $('#txtLongitude').attr('value', longitude);
+        //        if (place_id != "") {
+
+        //            $('#txtShopId').attr('value', '');
+        //            $('#txtShopName').attr('value', '');
+
+        //            var orgAddress = $('#txtFullAddressOriginal').val();
+
+        //            var cust = $('#customerId').val();
+        //            //$.post(
+        //            //    '/orders/getshopbyid/',
+        //            //    { custId: cust },
+        //            //    function (data) {
+        //            //        console.log(data);
+        //            //        $('#shoperrormsg').html('');
+        //            //        //alert(data.ShopName)
+        //            //        //alert(orgAddress +" == " + address)
+        //            //        if (orgAddress == address) {
+        //            //            if (data.Status == "OK") {
+        //            //                //alert(data.ShopName)
+        //            //                $('#txtShopId').attr('value', data.ShopId);
+        //            //                $('#txtShopName').attr('value', data.ShopName);
+        //            //                $('#txtZoneId').attr('value', data.ZoneId);
+        //            //            }
+        //            //        }
+        //            //        else {
+        //            //            //alert("call again")
+        //            //We where calling shopiId api
+
+        //            //        }
+        //            //    });
+        //            var obj = '{ "Dest_Place_Id": "' + place_id + '","CustomerName": "' + $('#txtCustName').val() + '","ContactNo": "' + $('#customerno').val() + '","Address": "' + address + '","Latitude": "' + latitude + '","Longitude": "' + longitude + '"}';
+        //            console.log(obj);
+        //            $.ajax({
+        //                //url: "https://recostack.qonverse.ai:5253/getshop",
+        //                url: "https://pyapix.spiritzone.in:8886/getshop",
+        //                data: obj,
+        //                type: "POST",
+        //                dataType: "json",
+        //                contentType: "application/json",
+        //                success: function (data) {
+        //                    console.log(data);
+        //                    $('#shoperrormsg').html('');
+        //                    if (data.Status == "OK") {
+        //                        $('#txtShopId').attr('value', data.ShopId);
+        //                        $('#txtShopName').attr('value', data.ShopName);
+        //                        $('#txtZoneId').attr('value', data.ZoneID);
+
+        //                        $('#txtFullAddressOriginal').attr('value', address);
+        //                    }
+        //                    $('#shoperrormsg').html(data.Message);
+        //                },
+        //                error: function (error) {
+        //                    console.log(error);
+        //                    console.log("error: " + error);
+        //                    $('#txtShopId').attr('value', '');
+        //                    $('#txtShopName').attr('value', '');
+        //                    $('#txtZoneId').attr('value', '');
+        //                    $('#shoperrormsg').html('Get Shop Api error.');
+        //                }
+        //            });
+        //        }
+        //    }, "json");
+        //});
+
+        $("#customerno").autocomplete({
+            source: function (request, response) {
+
+                $('#txtCustName').attr('value', '');
+                $('#txtFullAddress').attr('value', '');
+                $('#txtFullAddressOriginal').attr('value', '');
+                $('#customerId').attr('value', 0);
+                $('#txtLatitude').attr('value', '');
+                $('#txtLongitude').attr('value', '');
+
+                $.ajax({
+                    url: "/customerorder/search",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        //response(data);
+                        response($.map(data, function (item) {
+                            return { label: item.ContactNo, value: item.ContactNo, data: item };
+                        }));
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label);
+                var data = ui.item.data;
+                //console.log(data);
+                $('#txtCustName').attr('value', data.CustomerName);
+                $('#customerId').attr('value', data.Id);
+                if (data.CustomerAddresses.length > 0) {
+                    var address = data.CustomerAddresses[0];
+                    $('#txtFullAddress').attr('value', data.Address);
+                    $('#txtFullAddressOriginal').attr('value', address.FormattedAddress);
+                    $('#txtFlat').attr('value', address.Flat);
+                    $('#txtLandmark').attr('value', address.Landmark);
+                    //$('#txtLatitude').attr('value', address.Latitude);
+                    //$('#txtLongitude').attr('value', address.Longitude);
+                    //$('#txtPlaceId').attr('value', address.PlaceId);
+                    //$('#txtShopId').attr('value', address.WineShop.Id);
+                    //$('#txtShopName').attr('value', address.WineShop.ShopName);
+                }
+                else {
+                    $('#txtFullAddress').attr('value', data.Address);
+                    $('#txtFullAddressOriginal').attr('value', data.FormattedAddress);
+                    $('#txtFlat').attr('value', data.Flat);
+                    $('#txtLandmark').attr('value', data.Landmark);
+                    ////alert(data.Shop);
+                    ////$('#txtShopId').attr('value', data.Shop.Id);
+                    ////$('#txtShopName').attr('value', data.Shop.ShopName);
+                }
+                //$.ajax({
+                //    url: "/customerorder/GetExsitCust",
+                //    data: {
+                //        contactNo: ui.item.value
+                //    },
+                //    success: function (data) {
+                //        console.log(data);
+                //        $('#txtCustName').attr('value', data.CustomerName);
+                //        $('#customerId').attr('value', data.Id);
+                //        if (data.CustomerAddresses != undefined) {
+                //            var address = data.CustomerAddresses[0];
+                //            $('#txtFullAddress').attr('value', data.Address);
+                //            $('#txtFullAddressOriginal').attr('value', address.FormattedAddress);
+                //            $('#txtFlat').attr('value', address.Flat);
+                //            $('#txtLandmark').attr('value', address.Landmark);
+                //            $('#txtLatitude').attr('value', address.Latitude);
+                //            $('#txtLongitude').attr('value', address.Longitude);
+                //        }
+                //        else {
+                //            $('#txtFullAddress').attr('value', data.Address);
+                //            $('#txtFullAddressOriginal').attr('value', data.FormattedAddress);
+                //            $('#txtFlat').attr('value', data.Flat);
+                //            $('#txtLandmark').attr('value', data.Landmark);
+                //        }
+                //    },
+                //    error: function (error) {
+                //        $('#txtCustName').attr('value', '');
+                //        $('#txtFullAddress').attr('value', '');
+                //        $('#txtFullAddressOriginal').attr('value', '');
+                //        $('#txtFlat').attr('value', '');
+                //        $('#txtLandmark').attr('value', '');
+                //        $('#customerId').attr('value', '0');
+                //    }
+                //});
+            }
+        });
+                    //$('#txtShopName').change(function () {
+                    //    var t = $(this);
+                    //    if (t.val() == "") {
+                    //        $('#butSubmit').prop('disabled', true);
+                    //    }else{
+                    //        $('#butSubmit').prop('disabled', false);
+                    //    }
+                    //});
+    </script>
+}

@@ -1,0 +1,940 @@
+﻿@model RainbowWine.Models.OrderDetailsView
+
+@{
+    ViewBag.Title = "Details";
+    string userType = ViewBag.UserType as string;
+    var error = Request.QueryString["error"];
+    var perpost = ViewBag.PrePost ?? 0;
+    var delpickvalue = ViewBag.delpickvalue ?? "";
+    var delPayOption = ViewBag.delPayOption ?? "";
+    var txtoverAllDiscount = Model.Ord.DiscountUnit ?? 0;
+    var strDiscount = System.Configuration.ConfigurationManager.AppSettings["OverAllDiscount"];
+    var overAllDiscount = string.IsNullOrWhiteSpace(strDiscount) ? 0 : Convert.ToInt32(strDiscount);
+    int totalLinItem = 0;
+    bool OperationFlag = Model.Ord.WineShop.OperationFlag ?? false;
+    int statusid = Model.Ord.OrderStatu.Id;
+    int maxSent = Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["MaxSMSResent"]);
+    string statuses = System.Configuration.ConfigurationManager.AppSettings["OrderStatuses"];
+    var order = Model.Ord;
+    double ammt = 0;
+    double walletammt = 0;
+    if (Model != null && Model.Ord != null)
+    {
+        if (Model.Ord.WalletAmountUsed != null)
+        {
+            walletammt = Convert.ToDouble(Model.Ord.WalletAmountUsed.Value);
+            ammt = Convert.ToDouble(Model.Ord.OrderAmount) - Convert.ToDouble(Model.Ord.WalletAmountUsed.Value);
+        }
+        else
+        {
+            ammt = Convert.ToDouble(Model.Ord.OrderAmount);
+        }
+    }
+}
+@if (ViewBag.RefundSMS != null)
+{
+<script type="text/javascript">
+
+            window.onload = function () {
+                alert("@ViewBag.RefundSMS");
+                window.location.reload();
+            };
+</script>
+   }
+@section scripts{
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="~/Scripts/commonscript.js"></script>
+    <script>
+        $(function () {
+            //$('[data-toggle="popover"]').popover({
+            $('#notthere').popover({
+
+            placement: "top",
+                html: 'true',
+                title:'Not There?',
+                content: function () {
+                    return $('#popover-content').html();
+                }
+            });
+            $('body').on('hidden.bs.popover', function (e) {
+                $(e.target).data("bs.popover").inState.click = false;
+            });
+            $(document).on("click", ".popover #btnCancel", function () {
+                    $("#notthere").popover("hide");
+            });
+            $(document).on("click", ".popover #btnOk", function () {
+                var ptext = $('.popover #txtContent').val();
+                $.post("/orders/NoThere",
+                    { "orderId": @Model.Ord.Id, text: ptext },
+                    function (data) {
+                    console.log(data);
+                    if (data.status == '0') {
+                        alert("Product name added successfully.");
+                    }
+                    else if (data.status == '1') {
+                        alert("Order id is null");
+                    }
+                    else if (data.status == '2') {
+                        alert("Product Name is null.");
+                    }
+                    else if (data.status == '3') {
+                        alert("Order id is 0.");
+                    }
+                    else if (data.status == '4') {
+                        alert("Order or Customer is null.");
+                    }
+                    $("#notthere").popover("hide");
+                });
+            });
+        });
+
+        $('#btnSendSms').click(function () {
+            if (confirm('Are you sure, do you want to resend the sms.')) {
+                $.post(
+                    '/Orders/ReSendSMSPaymentLink/',
+                    { OrderId: @Model.Ord.Id ,ContactNo: @Model.Ord.OrderTo, CustomerId:@Model.Cust.Id },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.status) {
+                                alert('Sms sent successfully.')
+                            }
+                            else {
+                                alert(item.msg)
+                            }
+                        }
+                    }, "json");
+            }
+            return false;
+        });
+        $('#submit-button').click(function () {
+            var email = $('#modal-text').val();
+            if (!IsEmail(email)) {
+                alert('Please valid email.');
+                return;
+            }
+            if (confirm('Are you sure, do you want to send the email.')) {
+                $.post(
+                    '/Orders/SendEmailPaymentLink/',
+                    { OrderId: @Model.Ord.Id , Email: email, CustomerId:@Model.Cust.Id },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.status) {
+                                alert('Email sent successfully.')
+                            }
+                            else {
+                                alert(item.msg)
+                            }
+                        }
+                    },"json");
+            }
+            else { return; }
+            document.getElementById('close-button').click();
+        });
+        $('#btnSendEmail').click(function () {
+            $('#model').model('show');
+            return false;
+        });
+
+
+        $('#overAllDiscount').change(function () {
+            var orderamt = $('#txtOrderAmount').val();
+            $('#txtoverAllDiscount').val($(this).val());
+            calculateDiscount(this, orderamt);
+        });
+        function displayDiscout(disamt, amtdis) {
+            $('#discountAmt').html('<strong>Disount Amt: </strong>' + disamt);
+            $('#totalDiscountAmt').html('<br/><strong>Total Amt after Discount: </strong>' + amtdis);
+        }
+        function calculateDiscount(obj, orderAmt) {
+
+            var dis = $(obj);
+            var disVal = dis.val();
+            $('#divdiscount').attr('style', 'display:none');
+
+            if (disVal != undefined && disVal > 0) {
+
+                $('#divdiscount').attr('style', 'display:block');
+                var amt = orderAmt;
+                var disamt = (disVal / 100) * amt;
+
+                var amtdis = amt - disamt;
+                displayDiscout(disamt, amtdis);
+            }
+        }
+
+        function GetDiscountAmt(obj, orderAmt) {
+            var amtdis = orderAmt;
+            var dis = $(obj);
+            var disVal = dis.val();
+            if (disVal != undefined && disVal > 0) {
+                var amt = orderAmt;
+                var disamt = (disVal / 100) * amt;
+                amtdis = amt - disamt;
+            }
+            return amtdis;
+        }
+
+     $("#txtProductSearch").autocomplete({
+        source: function (request, response) {
+
+             $('#proddiscountmsg').html('');
+             $('#prodinfomsg').html('');
+                $('#validitemmsg').html('');
+                $('#txtProductQtyAvail').attr('value','');
+                $('#OrdDetail_ProductID').attr('value', '');
+             $('#productprice').attr('value', '');
+              var ShopId = '@Model.Ord.ShopID';
+                $.ajax({
+                    url: "/orders/SearchProductWithMixer",
+                    data: {
+                        text: request.term, shopId: ShopId
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id:item.Id, price:item.price };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+         select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " price " + ui.item.price + " Id " + ui.item.Id);
+             var pid = ui.item.Id;
+             var IsGift = ui.item.IsGift;
+             var IsMixer = ui.item.IsMixer;
+             $('#productprice').attr('value', ui.item.price);
+             $('#OrdDetail_ProductID').attr('value', pid);
+                var OperationFlag = '@OperationFlag';
+                //alert(OperationFlag==true);
+                preorder = $('#orderPrePost').val();
+             if (preorder == 1 || OperationFlag == 'True') {
+                 $('#btnItemSubmit').attr("disabled", true);
+                 var dpShopId = $('#dpShopId').val();
+                 if (IsGift == 1) {
+                     $.ajax({
+                         url: "/orders/SearchGiftBagSelection",
+                         data: {
+                             giftBagDetailId: pid, shopId: dpShopId
+                         },
+                         success: function (data) {
+                             $('#txtProductQtyAvail').attr('value', data.qty);
+                             $('#prodinfomsg').html(data.msg);
+                             if (data.discount != undefined && data.discount > 0) {
+                                 $('#proddiscountmsg').html(data.discount + "% discount on the selected product.");
+                             }
+                             ValidateQtyItem($('#txtProductQtyAvail').val(), $('#OrdDetail_ItemQty').val());
+                         }
+                     });
+                 }
+                 else if(IsMixer == 1){
+                     $.ajax({
+                         url: "/orders/SearchMixerSelection",
+                         data: {
+                             mixerId: pid, shopId: dpShopId
+                         },
+                         success: function (data) {
+                             $('#txtProductQtyAvail').attr('value', data.qty);
+                             $('#prodinfomsg').html(data.msg);
+                             if (data.discount != undefined && data.discount > 0) {
+                                 $('#proddiscountmsg').html(data.discount + "% discount on the selected product.");
+                             }
+                             ValidateQtyItem($('#txtProductQtyAvail').val(), $('#OrdDetail_ItemQty').val());
+                         }
+                     });
+                 }
+                 else if (IsGift == 0 && IsMixer == 0) {
+                     $.ajax({
+                         url: "/orders/SearchProductSelection",
+                         data: {
+                             productId: pid, shopId: dpShopId
+                         },
+                         success: function (data) {
+                             $('#txtProductQtyAvail').attr('value', data.qty);
+                             $('#prodinfomsg').html(data.msg);
+                             if (data.discount != undefined && data.discount > 0) {
+                                 $('#proddiscountmsg').html(data.discount + "% discount on the selected product.");
+                             }
+                             ValidateQtyItem($('#txtProductQtyAvail').val(), $('#OrdDetail_ItemQty').val());
+                         }
+                     });
+                 }
+             }
+                else {$('#btnItemSubmit').attr("disabled", false);}
+
+            }
+        });
+        function ValidateQtyItem(qty, item) {
+            var uType = '@userType.ToLower()';
+            var statusid = '@statusid';
+            //if (statusid == 1 || uType == "shopper") {
+            if (statusid == 1) {
+                var qtyvalue = parseInt(qty)
+                var itemvalue = parseInt(item);
+                if (qtyvalue == undefined || qtyvalue == NaN) qtyvalue = 0;
+                if (itemvalue == undefined || item == NaN) itemvalue = 0;
+                console.log(qty + "< " + item)
+                if (!isNaN(itemvalue)) {
+                    if (itemvalue <= 0) {
+                        $('#btnItemSubmit').attr("disabled", true);
+                    }
+                    else if (qtyvalue < itemvalue) {
+                        $('#validitemmsg').html('\n Selected qty should not be greater than available qty.');
+                        $('#btnItemSubmit').attr("disabled", true);
+                    }
+                    else {
+                        $('#validitemmsg').html('');
+                        $('#btnItemSubmit').attr("disabled", false);
+                    }
+                }
+            }
+        }
+
+        $('#OrdDetail_ItemQty').change(function () {
+            preorder = $('#orderPrePost').val();
+            var OperationFlag = '@OperationFlag';
+            if (preorder == 1 || OperationFlag=='True') ValidateQtyItem($('#txtProductQtyAvail').val(), $(this).val());
+        });
+
+        //$('#orderPrePost').change(function () {
+        //    $('#txtorderPrePost').val($(this).val());
+        //});
+        //$('#mobileType').change(function () {
+        //    $('#txtmobileType').val($(this).val());
+        //});
+        $('#delpick').change(function () {
+            $('#txtdelpick').val($(this).val());
+        });
+        $('#dppayoption').change(function () {
+            $('#txtpayoption').val($(this).val());
+        });
+
+
+        $("body").on("submit", "#FormOrderSubmit", function () {
+            var uType = '@userType.ToLower()';
+            var totalamt = parseInt($('#txtOrdAmountDisplay').val());
+            var zoneId = $('#txtZoneId').val();
+            //alert(zoneId)
+            var zoneIds = ['52', '49', '8', '9', '10', '12', '14', '16', '24', '18', '34', '47', '50', '55'];
+            var zoneIds2 = ['44'];
+            //if ($.inArray(zoneId, zoneIds2) != -1) {
+            //    if (totalamt < 2000) {
+            //        alert("Minimum total amount of order is 2500 rs.")
+            //        return false;
+            //    }
+            //}
+            //else if ($.inArray(zoneId, zoneIds) != -1) {
+            //    if (totalamt < 5000) {
+            //        alert("Minimum total amount of order is 5000 rs.")
+            //        return false;
+            //    }
+            //}
+
+            totalamt = GetDiscountAmt($('#overAllDiscount'), totalamt);
+
+            var payoption = $('#dppayoption').val();
+            if (payoption==undefined || payoption == "")
+            {
+                alert("Please Pay option.");
+                return false;
+            }
+            else if (totalamt < 1000) {
+                alert("Minimum total amount of order is 1000 rs.")
+                    return false;
+            }
+            //}
+            return confirm("Are you sure you want to submit this order? You will not be able to modify this order after submission.");
+        });
+
+        //Product Iem edit
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            //$('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            //console.log("DD");
+            var tr = $(this).parents('tr:first');
+            var OrderDetailsId = $(this).prop('id');
+            var ItemQty = tr.find('#ItemQty-Edit').val();
+            $.post(
+                '/Orders/OrderItemUpdate/',
+                { OrderDetailsId: OrderDetailsId, ItemQty: ItemQty },
+                function (item) {
+                    tr.find('#txtItemQty').text(item.ItemQty);
+                    tr.find('#ItemQty-Edit').val(item.ItemQty);
+                    $('#lblOrdAmountDisplay').html(item.OrderAmount);
+                    $('#txtOrdAmountDisplay').attr('value', item.OrderAmount);
+                    $('#txtTotalLineItem').attr('value', item.TotalItem);
+
+                    tr.children('td:nth-child(6)').text(item.discountAmt);
+                    tr.children('td:nth-child(7)').text(item.discountTotalAmt);
+                    tr.children('td:nth-child(8)').text(item.ItemPrice);
+
+                    $('#txtOrderAmount').val(item.OrderAmount);
+                    calculateDiscount($('#overAllDiscount'), item.OrderAmount);
+
+                    //$('#txtDiscountAmount').attr('value', item.discountAmt);
+                    //$('#txtAmount').attr('value', item.discountTotalAmt);
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        var allDiscount=@txtoverAllDiscount;
+        if (allDiscount> 0) {
+            $('#overAllDiscount').val(@txtoverAllDiscount);
+
+            var orderamt = $('#txtOrderAmount').val();
+            var amt =@(Model.Ord.DiscountAmount ?? 0);
+            if (amt > 0) {
+                var caldis = parseFloat(orderamt) - parseFloat(amt);
+
+                if (@Model.Ord.OrderStatusId!= 1) caldis = orderamt;
+                displayDiscout(amt, caldis);
+            }
+        }
+        $(".deleteItem").click(function () {
+            $(this).attr("href", $(this).attr("href") + "&overalldiscount=" + $("#overAllDiscount").val());
+        });
+    </script>
+}
+<h2>Order Details</h2>
+<div id="popover-content" class="hide">
+    <div class="form-group">
+        Product Name
+        <input class="form-control" id="txtContent" type="text" />
+        <button id="btnOk" type="button" class="btn btn-default">
+            Save
+            @*<span class="glyphicon glyphicon-ok"></span>&nbsp;*@
+        </button>
+        <button id="btnCancel" type="button" class="btn btn-default">
+            Close
+            @*<span class="glyphicon glyphicon-remove"></span>&nbsp;*@
+        </button>
+    </div>
+</div>
+<div class="row">
+    @*@Html.ActionLink("New Order", "Create", "CustomerOrder", null, new { @class = "btn btn-default" })
+        @Html.ActionLink("Order List", "Index", "Orders", null, new { @class = "btn btn-default" })*@
+    <hr />
+    @using (Html.BeginForm("SubmitOrder", "Orders", new { id = Model.Ord.Id }, FormMethod.Post, new { @id = "FormOrderSubmit" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("txtOrdAmountDisplay", Model.Ord.OrderAmount, new { @id = "txtOrdAmountDisplay" })
+        @Html.Hidden("txtZoneId", Model.Ord.ZoneId, new { @id = "txtZoneId" })
+        @Html.Hidden("txtOrderAmount", Model.Ord.OrderAmount, new { @id = "txtOrderAmount" })
+        <input type="submit" value="Submit" class="btn btn-default" @(((Model.CurOrdDetail.Count <= 0 || Model.Ord.OrderStatusId != 1)) ? "disabled" : "") />
+        if (Model.Ord.OrderStatusId == 35)
+        {
+            <button class="btn btn-default" id="btnSendSms" @((Model.SmsSent == null || Model.SmsSent?.SMSSentCount <= maxSent) ? "" : "disabled")>Send SMS</button>
+            <input type="button" class="btn btn-default" id="btnSendEmail" data-toggle="modal" data-target="#myModal" value="Send Email" />
+        }
+        <p></p>
+        if (userType.ToLower() == "salesmanager" || userType.ToLower() == "shopper")
+        {
+            <p>
+                Discount:
+                <input data-val="true" data-val-number="The field Double must be a number." data-val-required="The Double field is required."
+                       id="overAllDiscount" max="25" min="0" name="overAllDiscount" type="number" value="0"
+                       @((userType.ToLower() == "shopper") ? "disabled" : "")>
+                @*@Html.TextBox("overAllDiscount", (double)ViewBag.overAllDiscount, new { @disabled=, @placeholder = "Discount...", @type = "number", @min = "0", @max = overAllDiscount,  })*@
+            </p>
+            <p id="divdiscount"><span id="discountAmt"></span><span id="totalDiscountAmt"></span></p>
+        }
+
+        <p>
+            <select id="delpick" name="delpick">
+                <option value="Delivery" @((delpickvalue == "Delivery") ? "selected" : "")>Delivery</option>
+                <option value="Pickup" @((delpickvalue == "Pickup") ? "selected" : "")>Pickup</option>
+            </select>
+            @Html.DropDownList("dppayoption", (IEnumerable<SelectListItem>)@ViewBag.PayOption, "Select Pay option", htmlAttributes: new { @class = "form-control", @id = "dppayoption", @style = "width:160px;" })
+
+
+            @*<select id="mobileType" name="mobileType">
+                    <option value="Android" @((mobileTypevalue == "Android") ? "selected" : "")>Android</option>
+                    <option value="iOS" @((mobileTypevalue == "iOS") ? "selected" : "")>iOS</option>
+                </select>
+
+                <select id="orderPrePost" name="orderPrePost">
+                    <option value="0" @((perpost == 0) ? "selected" : "")>PreOrder</option>
+                    <option value="1" @((perpost == 1) ? "selected" : "")>Normal Order</option>
+                </select>*@
+        </p>
+
+    }
+    <hr />
+    <div class="alert-danger">@error</div>
+    <dl class="col-md-6  dl-horizontal">
+        <dt>
+            Order No
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Ord.Id)
+        </dd>
+        <dt>
+            Order Date
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Ord.OrderDate)
+        </dd>
+
+        <dt>
+            Agent Name
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Ord.OrderPlacedBy)
+        </dd>
+        @if (userType != "Agent" && userType != "DeliveryManager")
+        {
+            <dt>
+                MobileNo.
+            </dt>
+
+            <dd>
+                @Convert.ToInt64(Model.Ord.OrderTo)
+            </dd>
+        }
+        <dt>
+            Amount
+        </dt>
+
+        <dd id="lblOrdAmountDisplay">
+            @Html.DisplayFor(model => model.Ord.OrderAmount)
+            @*@Html.Label("lblOrdAmountDisplay", ((int)Model.Ord.OrderAmount).ToString(), new { @id = "lblOrdAmountDisplay" })*@
+        </dd>
+        @if (Model.Ord.PaymentTypeId == 2)
+        {
+            <dt>
+                To be paid:
+            </dt>
+        }
+        else
+        {
+            <dt>
+                Online Payment:
+            </dt>
+        }
+
+        <dd>
+            @ammt
+
+        </dd>
+        <dt>
+            Wallet Used Amount:
+        </dt>
+        <dd>
+            @walletammt
+        </dd>
+        @*@if (Model.Ord.WalletAmountUsed > 0 && Model.Ord.WalletAmountUsed != null)
+            {
+                <dt>
+                    Wallet Amount
+                </dt>
+
+                <dd id="lblOrdAmountDisplay">
+                    @Html.DisplayFor(model => model.Ord.WalletAmountUsed)
+                </dd>
+            }*@
+        <dt>
+            Status
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Ord.OrderStatu.OrderStatusName)
+        </dd>
+
+        <dt>
+            Customer Name
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Cust.CustomerName)
+        </dd>
+        <dt>
+            Customer Address
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Cust.Address)
+        </dd>
+        <dt>
+            Flat/Building No
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Cust.Flat)
+        </dd>
+        <dt>
+            Landmark
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Ord.Customer.Landmark)
+        </dd>
+        @if (!string.IsNullOrEmpty(Model.Ord.AppVersion))
+        {
+            <dt>
+                App Plat Form
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Ord.AppPlatForm)
+            </dd>
+
+            <dt>
+                App Version
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Ord.AppVersion)
+            </dd>
+        }
+
+        <dt>
+            Gift
+        </dt>
+
+        <dd>
+            @if (Model.Ord.IsGift == true)
+            {
+                <div>Yes</div>
+            }
+            else
+            {
+                <div>No</div>
+            }
+        </dd>
+        @if (Model.Ord.IsGift == true)
+        {
+            <dt>
+                Recipient Name
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Ord.RecipientName)
+            </dd>
+
+            <dt>
+                Recipient Number
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Ord.RecipientNumber)
+            </dd>
+        }
+        @if (Model.Ord.ProcessedDate != null && Model.Ord.ARNNumber != null)
+        {
+            <dt>
+                ARN Number
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Ord.ARNNumber)
+            </dd>
+            <dt>
+                Processed On
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Ord.ProcessedDate)
+            </dd>
+        }
+        @if (Model.Ord.OrderStatusId == 27 && userType.ToLower() == "shopper" && Model.Ord.PaymentTypeId==1)
+        {
+            <dt>
+                Full Refund
+            </dt>
+            <dd>
+                @Html.ActionLink("Full Refund", "FullRefund", "Orders", new { id = Model.Ord.Id }, new { onclick = $"return confirm('Are you sure you want to refund this order amount?: {Model.Ord.OrderAmount}');" })
+            </dd>
+        }
+    </dl>
+
+
+    @using (Html.BeginForm("CreateDetail"))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="col-md-6">
+            <h4>Order Detail</h4>
+            <div class="alert-info" id="prodinfomsg"></div>
+            <div class="alert-info" id="validitemmsg"></div>
+            <div class="alert-info" id="proddiscountmsg"></div>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @*<div class="form-group">
+                    @Html.LabelFor(model => model.OrdDetail.OrderId, "OrderId", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList("OrderId", null, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.OrdDetail.OrderId, "", new { @class = "text-danger" })
+                    </div>
+                </div>*@
+
+            <div class="form-group">
+                @Html.Label("Product", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @*@Html.Hidden("txtorderPrePost", ((int)perpost).ToString(), new { @class = "form-control", @id = "txtorderPrePost" })
+                        @Html.Hidden("txtmobileType", ((string)mobileTypevalue).ToString(), new { @class = "form-control", @id = "txtmobileType" })*@
+                    @Html.Hidden("txtoverAllDiscount", Convert.ToString(txtoverAllDiscount), new { @class = "form-control", @id = "txtoverAllDiscount" })
+                    @Html.Hidden("txtdelpick", ((string)delpickvalue).ToString(), new { @class = "form-control", @id = "txtdelpick" })
+                    @Html.Hidden("txtpayoption", ((string)delPayOption).ToString(), new { @class = "form-control", @id = "txtpayoption" })
+                    @Html.TextBox("txtProductSearch", null, new { @class = "form-control", @id = "txtProductSearch" })
+                    <a data-toggle="popover" data-html='true' id="notthere">Not There?</a>
+                    @Html.HiddenFor(model => model.OrdDetail.ProductID, new { htmlAttributes = new { @class = "form-control", @id = "txtProductID" } })
+                    @Html.Hidden("txtProductQtyAvail", null, new { @class = "form-control", @id = "txtProductQtyAvail" })
+                    @*@Html.DropDownListFor(model => model.OrdDetail.ProductID, (IEnumerable<SelectListItem>)@ViewBag.ProductID, htmlAttributes: new { @class = "form-control", @id = "productselect" })*@
+                    @Html.ValidationMessageFor(model => model.OrdDetail.ProductID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrdDetail.ItemQty, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrdDetail.ItemQty, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.OrdDetail.ItemQty, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrdDetail.Price, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrdDetail.Price, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", @id = "productprice" } })
+                    @Html.ValidationMessageFor(model => model.OrdDetail.Price, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrdDetail.ShopID, "ShopID", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.OrdDetail.ShopID, (IEnumerable<SelectListItem>)@ViewBag.ShopID, htmlAttributes: new { @class = "form-control", @id = "dpShopId" })
+                    @Html.ValidationMessageFor(model => model.OrdDetail.ShopID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input id="btnItemSubmit" type="submit" value="Create" class="btn btn-default" @((Model.Ord.OrderStatusId != 1) ? "disabled" : "") />
+                </div>
+            </div>
+        </div>
+    }
+    <div class="dl-horizontal">
+
+        <table class="table">
+            <tr>
+                <th>
+                    ItemQty
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Order Placed By
+                </th>
+                <th>
+                    Product Name
+                </th>
+                <th>
+                    Goodies Name
+                </th>
+                <th>
+                    Shop Name
+                </th>
+                <th>
+                    Order Type
+                </th>
+                <th>
+                    Discount %
+                </th>
+                <th>
+                    Discount Amt
+                </th>
+                <th>
+                    Total Amt
+                </th>
+                <th></th>
+            </tr>
+
+            @{
+                foreach (var item in Model.CurOrdDetail)
+                {
+                    totalLinItem = totalLinItem + item.ItemQty;
+
+                    decimal amt = item.Price * item.ItemQty;
+                    if ((item.DiscountProductId ?? 0) > 0)
+                    {
+                        amt -= Convert.ToDecimal(item.DiscountAmount);
+                    }
+                    <tr>
+                        <td>
+                            @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "txtItemQty" })
+                            @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Order.OrderPlacedBy)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProductDetail.ProductName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.GName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.WineShop.ShopName)
+                        </td>
+                        <td>
+                            Liquor
+                        </td>
+                        <td>
+                            @item.DiscountUnit
+                        </td>
+                        <td>
+                            @item.DiscountAmount
+                        </td>
+                        <td>
+                            @amt
+                        </td>
+                        <td>
+                            @*@Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                                @Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
+                            @if (Model.Ord.OrderStatusId == 1)
+                            {
+                                @Html.ActionLink("Delete", "RemoveItem", new { id = item.Id, oid = Model.Ord.Id }, new { @class = "deleteItem" })
+
+                                <button class="btn_grid edit-item display-mode" id="@item.Id">Edit</button>
+                                <button class="btn_grid save-item edit-mode" id="@item.Id">Save</button>
+                                <button class="btn_grid cancel-item edit-mode" id="@item.Id">Cancel</button>
+                            }
+                        </td>
+                    </tr>
+                }
+                foreach (var item in Model.MixerItems)
+                {
+                    totalLinItem = totalLinItem + item.ItemQty ?? 0;
+                    decimal amt = Convert.ToDecimal((item.Price ?? 0) * (item.ItemQty ?? 0));
+
+                    <tr>
+                        <td>
+                            @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "txtItemQty" })
+                            @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Order.OrderPlacedBy)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MixerDetail.Mixer.MixerName)
+                        </td>
+                        <td></td>
+                        <td>
+                            @{
+                                if (item.WineShop != null)
+                                {
+                                    @item.WineShop.ShopName
+                                }
+                                else
+                                {
+                                    @item.Supplier.Name
+                                }
+                            }
+                        </td>
+                        <td>
+                            Mixer
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            @amt
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                }
+                foreach (var item in Model.GiftBagItems)
+                {
+                    totalLinItem = totalLinItem + item.ItemQty ?? 0;
+                    decimal amt = Convert.ToDecimal((item.Price ?? 0) * (item.ItemQty ?? 0));
+
+                    <tr>
+                        <td>
+                            @Html.Label(((int)item.ItemQty).ToString(), new { @class = "display-mode", @id = "txtItemQty" })
+                            @Html.TextBox("ItemQty-Edit", ((int)item.ItemQty).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrderPlacedBy)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.GiftBagName)
+                        </td>
+                        <td></td>
+                        <td>
+                            @item.ShopName
+
+
+                        </td>
+                        <td>
+                            Gift
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                            @amt
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+
+                }
+            }
+            @Html.Hidden("txtTotalLineItem", totalLinItem, new { @id = "txtTotalLineItem" })
+    </div>
+</div>
+@*<p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>*@
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Send Email</h4>
+            </div>
+            <div class="modal-body">
+                <!-- The Modal text box-->
+                <input id="modal-text" type="text" value="@ViewBag.PaySentEmail" />
+            </div>
+            <div class="modal-footer">
+                <button id="submit-button" type="button" class="btn btn-default">Submit</button>
+                <button id="close-button" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>

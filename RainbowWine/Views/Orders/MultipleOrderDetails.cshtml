@@ -1,0 +1,155 @@
+﻿@model IEnumerable<RainbowWine.Data.MixerOrderItem>
+
+@{
+    ViewBag.Title = "MultipleOrderDetails";
+    var updateAllowOnStatus = ViewBag.UpdateAllowOnStatus;
+    var giftCharge =Convert.ToDouble(ViewBag.GiftCharge);
+}
+
+<h2>Order Details</h2>
+@if (Model == null)
+{
+    <p>
+        No Records
+    </p>
+}
+else if (Model.ToList()[0].Supplier == null)
+{
+
+    <p>Order is not supplier order.</p>
+}
+else
+{
+    RainbowWine.Data.Order ord = (RainbowWine.Data.Order)ViewBag.Order;
+    RainbowWine.Data.CustomerAddress address = (RainbowWine.Data.CustomerAddress)ViewBag.OrderAddress;
+
+    <p>@TempData["msg"]</p>
+    <p>
+        <div class="col-md-6  dl-horizontal">
+            <dl>
+                <dt>Supplier:</dt>
+                <dd>@Model.ToList()[0].Supplier.Name</dd>
+                <dt>Customer:</dt>
+                <dd>@Model.ToList()[0].Order.Customer.CustomerName</dd>
+                <dt>Order Id:</dt>
+                <dd>@ord.Id</dd>
+                <dt>Order GroupId:</dt>
+                <dd>@ord.OrderGroupId</dd>
+            </dl>
+        </div>
+        <div class="col-md-5 dl-horizontal">
+            <dl>
+                <dt>Status:</dt>
+                <dd>
+                    @using (Html.BeginRouteForm("PostMultipleOrderUpdateStatus", FormMethod.Post))
+                    {
+                        <input id="orderId" name="orderId" value="@Model.ToList()[0].OrderId" />
+                        @Html.DropDownList("dpStatusId", (IEnumerable<SelectListItem>)@ViewBag.StatusId, "Select Status", htmlAttributes: new { @class = "form-control", @id = "dpStatusId" })
+                        <button type="submit" id="btnSubmit">Submit</button>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </p>
+    <table class="table">
+        <tr>
+            @*<th>
+                @Html.DisplayNameFor(model => model.OrderGroupId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderId)
+            </th>*@
+            <th>
+                Mixer Name
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                Total
+            </th>
+        </tr>
+
+        @{
+            double totalqty = 0;
+
+            foreach (var item in Model)
+            {
+                double price = 0;
+                if (item.MixerDetail.Mixer.MixerType == "giftwrap")
+                {
+                    price = item.MixerDetail.Mixer.GiftPrice??0; //giftCharge;
+                }
+                else
+                {
+                    price = Convert.ToDouble(item.Price);
+                }
+
+                double amt = price * Convert.ToDouble(item.ItemQty);
+                totalqty += amt;
+                <tr>
+                    @*<td>
+                        @Html.DisplayFor(modelItem => item.OrderGroupId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderId)
+                    </td>*@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MixerDetail.Mixer.MixerName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemQty)
+                    </td>
+                    <td>
+                        @price
+                    </td>
+                    <td>
+                        @amt
+                    </td>
+                </tr>
+            }
+        }
+        <tr>
+           
+            <th></th>
+            <th></th>
+            <th>
+                Total
+            </th>
+            <th>
+                @totalqty
+            </th>
+        </tr>
+    </table>
+}
+@section scripts{
+    <script>
+        var arrStatus = @Html.Raw(Json.Encode(updateAllowOnStatus));
+        //console.log(arrStatus);
+        LoadSubBut();
+
+        $('#dpStatusId').change(function () {
+            var selectedItem = $(this);
+            var val = parseInt(selectedItem.val());
+            SubmitActive(val);
+        });
+        function LoadSubBut()
+        {
+            var selectedItem = $('#dpStatusId');
+            var val = parseInt(selectedItem.val());
+            SubmitActive(val);
+        }
+        function SubmitActive(d) {
+            if ($.inArray(d, arrStatus) != -1) {
+                $('#btnSubmit').prop('disabled', false);
+            }
+            else {
+                $('#btnSubmit').prop('disabled', true);
+            }
+        }
+    </script>
+    
+    }

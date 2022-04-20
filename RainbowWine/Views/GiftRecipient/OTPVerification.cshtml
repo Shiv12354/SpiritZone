@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = "OTP Verification";
+    Layout = null;
+}
+<script src="~/Scripts/modernizr-2.8.3.js"></script>
+<script src="~/Scripts/requireJS.js"></script>
+<!--Same font as Spiritzone.in (Montserrat)-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        background-color: #fffff7;
+        font-family: "Montserrat", sans-serif;
+    }
+
+    /* Disabling the HR tag */
+    hr {
+        display: none;
+    }
+
+    .sz-header {
+        font-family: 'Times New Roman';
+    }
+
+    .navbar {
+        /*background-color: #8e0033 !important;*/
+        background: linear-gradient( 45deg,#8e0033 0%,#d00f54 100%);
+    }
+
+    .navbar-brand {
+        font-weight: bolder;
+        color: white !important;
+    }
+
+    .navbar-nav a {
+        font-weight: bold;
+        color: white !important;
+    }
+
+    .navbar-inverse, .navbar-collapse {
+        border: none;
+    }
+
+    .sz-logo {
+        max-width: 200px;
+    }
+
+    .sz-color {
+        color: #8e0033;
+    }
+
+    .sz-label {
+        font-weight: bold;
+    }
+
+    .sz-input {
+        background-color: #fffff7;
+        padding: 8.5px 5px 8.5px 15px;
+        border-radius: 100px;
+        border: 1px solid #8e0033;
+        box-shadow: 0px 5px 20px rgba(142, 0, 51, 0.2);
+    }
+
+        .sz-input::placeholder {
+            font-weight: bolder;
+        }
+
+    .sz-btn {
+        color: white;
+        font-weight: bolder;
+        border-radius: 50px;
+        background: linear-gradient( 45deg,#8e0033 0%,#d00f54 100%);
+        box-shadow: 0px 5px 20px rgba(142, 0, 51, 0.2);
+    }
+
+        .sz-btn:hover {
+            color: white;
+        }
+
+        .sz-btn:active {
+            background-color: #8e0033;
+            color: white;
+        }
+
+    /* Hiding the arrows from the Input tags */
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+@if (ViewBag.Recipient == 1)
+{
+    <div class="container text-center" style="text-align:center">
+        <div class="intro">
+            <img class="sz-logo" src="https://play-lh.googleusercontent.com/77K8_yfRQEuagn1wzGtVqmsPOogauY-YN9nvxg12GOvWdjDalTq_Iqhr9sT0SFwhxvU" alt="Spiritzone" />
+            <h1 class="sz-header sz-color">Welcome To SPIRITZONE</h1>
+            <h4 class="sz-color">Your contact-less digital drinking buddy</h4>
+        </div>
+        <div>
+            <h4>Please Enter the OTP (One Time Password)<br />sent to your registered mobile no:@ViewBag.MobileNo</h4>
+        </div>
+        <!--<div>
+            <h4>Sent to your registered mobile no:@ViewBag.MobileNo</h4>
+        </div>-->
+
+        <div>
+            <p><strong>This OTP will expire in 5 minutes.</strong></p>
+        </div>
+        <br />
+        <div>
+            <div class="row">
+                <input class="sz-input" type="number" id="txtOPT" name="name" placeholder="Enter OTP" value="" />
+                <button id="btnValidateOPT" class="btn sz-btn">Validate OTP</button>
+            </div>
+            <br />
+            <!--<div>
+                <button id="btnValidateOPT">Validate OTP</button>
+            </div>-->
+        </div>
+    </div>
+}
+else if (ViewBag.Message != null)
+{
+    <h2 style="text-align:center">@ViewBag.Message</h2>
+
+}
+else
+{
+    <h2 style="text-align:center">We couldn't find an order against this contact number.</h2>
+}
+@Scripts.Render("~/bundles/jquery")
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+        $("#btnValidateOPT").click(function () {
+            Validate();
+        });
+        function Validate() {
+            var otp = $("#txtOPT").val();
+            var tok = '@ViewBag.Token';
+            var mobmo = '@ViewBag.MobileNo';
+            var orderId = '@ViewBag.OrderId';
+            if (otp.trim() == "") {
+                alert("Please enter OTP.");
+                return;
+            }
+            else {
+                $.post(
+                    'VerifyOTP',
+                    { Mobile: @ViewBag.MobileNo, OTP: otp  },
+                    function (item) {
+                        if (item.Data.IsVerified == true) {
+                            window.location.href = "/GiftRecipient/RecipientDetail?mobile=" + mobmo +"&token="+tok+"&orderId=" + orderId;
+                        }
+                        else if (item.Data.IsVerified == false){
+                                alert(item.message);
+                        }
+                    }, "json");
+            }
+
+        }
+</script>

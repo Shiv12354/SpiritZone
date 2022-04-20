@@ -1,0 +1,170 @@
+﻿@model IEnumerable<RainbowWine.Models.InventoryViewModel>
+
+@{
+    ViewBag.Title = "List";
+    var grid = new WebGrid(Model, canPage: true, rowsPerPage: 20, selectionFieldName: "selectedRow", ajaxUpdateContainerId: "gridContent");
+    grid.Pager(WebGridPagerModes.FirstLast);
+    string ShopName = (Model != null && Model.Count() > 0) ? Model.ToList()[0].ShopName : "";
+}
+<h2>Inventory Management</h2>
+<p>
+    <input type="text" placeholder="Shop Name" id="txtShopSearch" value="@ViewBag.ShopName" />
+    <input type="text" placeholder="Product Name" id="txtProductSearch" value="@ViewBag.ProductName" />
+    <button id="btnSearch">Search</button>
+</p>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+@if (Model != null && Model.Count() > 0)
+{
+<div>
+    @grid.GetHtml(tableStyle: "table",
+                    headerStyle: "",
+                    alternatingRowStyle: "alt",
+                    selectedRowStyle: "select",
+                    htmlAttributes: new { @id = "WebGrid" },
+                    columns: grid.Columns(
+                     grid.Column("",
+                            style: "col1",
+                            format: @<text><div style="padding-left:20px;">
+                                        <button class="btn btn-default edit-item display-mode " id="@item.InventoryId">Edit</button>
+                                        @Html.ActionLink("Delete", "Delete", new { id = item.InventoryId }, new { @class = "btn btn-default display-mode " })
+                                        @*<button class="btn_grid display-mode delete-item" id="@item.InventoryId">Delete</button>*@
+                                        <button class="btn btn-default save-item edit-mode" id="@item.InventoryId">Save</button>
+                                        <button class="btn btn-default cancel-item edit-mode" id="@item.InventoryId">Cancel</button>
+                                    </div>
+                            </text>),
+grid.Column("Id",
+format:@<text>
+                @Html.ActionLink(((int)item.InventoryId).ToString(), "Edit", new { id = item.InventoryId })
+</text>),
+grid.Column("Product Name", style: "col3",
+format:@<text>
+                @Html.Label((string)item.ProductName, new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Qty Available", style: "col4",
+format:@<text>
+                @Html.Label(((int)item.QtyAvailable).ToString(), new { @class = "display-mode", @id = "QtyAvailable" })
+                @Html.TextBox("QtyAvailable-Edit", ((int)item.QtyAvailable).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+</text>
+),
+grid.Column("Price", style: "col7",
+format:@<text>
+            @Html.Label(((double)item.Price).ToString(), new { @class = "display-mode", @id = "MRP" })
+            @Html.TextBox("MRP-Edit", ((double)item.Price).ToString(), new { @class = "edit-mode", style = "width: 50px;" })
+            </text>
+   ),
+   grid.Column("Size", style: "col8",
+   format:@<text>
+                            @Html.Label(((string)item.Size).ToString(), new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Shop Name", style: "col5",
+format:@<text>
+                @Html.Label(((string)item.ShopName).ToString(), new { @class = "normal-mode" })
+</text>
+),
+grid.Column("Packing Size", style: "col6",
+format:@<text>
+                @Html.Label(((int)item.PackingSize).ToString(), new { @class = "normal-mode" })
+                @*@Html.TextBox("PackingSize", ((int)item.PackingSize).ToString(), new { @class = "edit-mode" })*@
+</text>
+)
+)
+)
+</div>
+}
+else
+{
+    <h3>No Data</h3>
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $("#txtProductSearch").autocomplete({
+            
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchProductMaster",
+                    data: {
+                        text: request.term, shopId: 12
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                //console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " price " + ui.item.price + " Id " + ui.item.Id);
+            }
+        });
+        $("#txtShopSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchShop",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+            }
+        });
+    </script>
+    <script>
+        $('#btnSearch').click(function () {
+            var product = $('#txtProductSearch').val();
+            var shop = $('#txtShopSearch').val();
+
+            if (product != '' || shop != '') {
+                window.location = "/Inventories/Index?product=" + product + "&shop=" + shop;
+            }
+        })
+    </script>
+    <script>
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            $('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            var InventoryId = $(this).prop('id');
+            var QtyAvailable = tr.find('#QtyAvailable-Edit').val();
+            var MRP = tr.find('#MRP-Edit').val();
+            $.post(
+                '/Inventories/SaveInventory/',
+                { InventoryId: InventoryId, QtyAvailable: QtyAvailable, MRP:MRP },
+                function (item) {
+                    tr.find('#QtyAvailable').text(item.QtyAvailable);
+                    tr.find('#QtyAvailable-Edit').val(item.QtyAvailable);
+                    //tr.find('#MRP').text(item.MRP);
+                    //tr.find('#MRP-Edit').val(item.MRP);
+                }, "json");
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+    </script>
+
+}

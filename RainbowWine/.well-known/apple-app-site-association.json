@@ -1,0 +1,11 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "CNAL8C4H5U.com.crossgeeks.applinkssample",
+                "paths": [ "/hello/*"]
+            }
+        ]
+    }
+}

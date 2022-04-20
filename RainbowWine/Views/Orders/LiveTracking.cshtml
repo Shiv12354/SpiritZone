@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewBag.Title = "LiveTracking";
+}
+
+<h2>LiveTracking</h2>
+@if (ViewBag.Message !=null)
+{
+<h4><div>@ViewBag.Message</div></h4>
+}
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe src="@ViewBag.LiveTracking" style="
+      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 20px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+    " allowfullscreen class="embed-responsive-item" title="Iframe Example"></iframe>
+</div>
+

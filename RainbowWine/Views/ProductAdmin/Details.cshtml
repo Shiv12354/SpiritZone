@@ -1,0 +1,96 @@
+﻿@model RainbowWine.Models.ProductAdmin
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Product Detail</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        @Html.Hidden("prodId", @Model.ProductID)
+        <dt>
+           App Product Name
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MasterProductName)
+        </dd>
+
+        <dt>
+            Product Name
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductName)
+        </dd>
+
+        <dt>
+            Packing Size
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PackingSize)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Category)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Category)
+        </dd>
+
+        <dt>
+            Size
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Capacity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IsDelete)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IsDelete)
+        </dd>
+
+
+    </dl>
+</div>
+<p>
+    <div class="col-md-2">
+        @Html.ActionLink("Edit", "Edit", new { id = Model.ProductID })
+    </div>
+    <div class="col-md-2">
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+    <div class="col-md-2">
+        <button id="btnSearch">Barcode Details</button>
+    </div>
+</p>
+
+@section scripts{
+    <script>
+        
+        $('#btnSearch').click(function () {
+            var prodid = $('#prodId').val();
+            window.location = "/ProductBarcode/index?pdId=" + prodid;
+
+            //if (shopid != '' || statusid != '' || soid != '') {
+            //    window.location = "/orders/index?shopId=" + shopid + "&shopname=" + shopname + "&statusId=" + statusid + "&statusname=" + statusname + "&soid=" + soid;
+            //}
+        });
+    </script>
+}

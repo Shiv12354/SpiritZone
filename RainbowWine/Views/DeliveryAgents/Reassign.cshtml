@@ -1,0 +1,238 @@
+﻿@model IEnumerable<RainbowWine.Models.RoutePlanViewModel>
+
+@{
+    ViewBag.Title = "Reassign";
+}
+
+<h2>Reassign</h2>
+
+<p>
+    <input type="text" placeholder="Shop Name" id="txtShopSearch" value="@ViewBag.ShopName" />
+    @Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)@ViewBag.ShopId, "Select Shop", htmlAttributes: new { @class = "form-control", @id = "dpShopId", @style = "display:none;" })
+
+    <input type="text" placeholder="Delivery Agent Name" id="txtDeliveryAgentSearch" value="@ViewBag.AgentName" />
+    @Html.DropDownList("dpAgentId", (IEnumerable<SelectListItem>)@ViewBag.AgentId, "Select Agent", htmlAttributes: new { @class = "form-control", @id = "dpAgentId", @style = "display:none;" })
+
+    <input type="text" placeholder="Order Id" id="txtOrderSearch" value="@(ViewBag.soid==0?"":ViewBag.soid)" />
+    <button id="btnSearch"> Search</button>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Delivery Agent Id
+        </th>
+        <th>
+            Delivery Agent Name
+        </th>
+        <th>
+            Order Id
+        </th>
+        <th>
+            Shop Name
+        </th>
+        <th>
+            Status
+        </th>
+        <th>
+            Assigned Date
+        </th>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Customer Address
+        </th>
+        <th>
+            Job Id
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>
+        @Html.Label(((int)item.DeliveryAgentId).ToString(), new { @class = "display-mode", @id = "txtAgentId" })
+    </td>
+    <td>
+        @Html.Label(((string)item.DeliveryAgent.DeliveryExecName).ToString(), new { @class = "display-mode", @id = "lblAgentName" })
+        @*@Html.TextBox("txtAgentName-Edit", ((string)item.DeliveryAgent.DeliveryExecName).ToString(), new { @class = "edit-mode" })*@
+        @Html.DropDownList("dpAgentName-Edit", (IEnumerable<SelectListItem>)item.SectionAgent, "Select Agent", htmlAttributes: new { @class = "edit-mode", @id = "dpAgentName-Edit" })
+
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.OrderID)
+    </td>
+    <td>
+        @Html.Label(((string)item.WineShop.ShopName).ToString(), new { @class = "display-mode", @id = "lblShopName" })
+        @Html.DropDownList("dpShopName-Edit", (IEnumerable<SelectListItem>)item.SectionShop, "Select Shop", htmlAttributes: new { @class = "edit-mode", @id = "dpShopName-Edit" })
+
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Description)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.AssignedDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Customer.CustomerName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Address)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.JobId)
+    </td>
+    <td>
+        @*@Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.id })*@
+
+        <button class="btn_grid edit-item display-mode" id="@item.id">BATCH</button>
+        <button class="btn_grid delete-item display-mode" id="@item.id">SINGLE</button>
+        <button class="btn_grid save-item edit-mode" id="@item.id">Save</button>
+        <button class="btn_grid cancel-item edit-mode" id="@item.id">Cancel</button>
+    </td>
+</tr>
+    }
+
+</table>
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $("#txtShopSearch").autocomplete({
+            source: function (request, response) {
+                $('#dpShopId').val('').attr("selected", "selected");
+                $.ajax({
+                    url: "/orders/SearchShop",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                            console.log(data);
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+                $('#dpShopId').val(ui.item.Id).attr("selected", "selected");
+            }
+        });
+        $("#txtDeliveryAgentSearch").autocomplete({
+            source: function (request, response) {
+                $('#dpAgentId').val('').attr("selected", "selected");
+                $.ajax({
+                    url: "/orders/SearchDeliveryAgent",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+                $('#dpAgentId').val(ui.item.Id).attr("selected", "selected");
+            }
+        });
+         $("#txtOrderSearch").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/orders/SearchOrder",
+                    data: {
+                        text: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.Name, value: item.Name, Id: item.Id };
+                        }))
+                    }
+                });
+            },
+            minLength: 2,
+            select: function (event, ui) {
+                console.log("Selected: " + ui.item.value + " aka " + ui.item.label + " Id " + ui.item.Id);
+
+            }
+        });
+        $('#btnSearch').click(function () {
+            var shopname = $('#txtShopSearch').val();
+            var shop = $('#dpShopId').val();
+            var agentname = $('#txtDeliveryAgentSearch').val();
+            var agent = $('#dpAgentId').val();
+            var soid = $('#txtOrderSearch').val();
+            window.location = "/DeliveryAgents/reassign?shop=" + shop + "&shopname=" + shopname + "&agent=" + agent + "&agentname=" + agentname + "&soid=" + soid;
+        })
+
+         //Agent Iem edit
+        
+        
+        $('.edit-mode').hide();
+        $('.edit-item').on('click', function () {
+            $('.edit-mode').hide();
+            //$('.delete-mode').hide();
+            $('.display-mode').show();
+            var tr = $(this).parents('tr:first');
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.cancel-item').on('click', function () {
+            var tr = $(this).parents('tr:first');
+            tr.find('.display-mode,.edit-mode').toggle();
+        });
+        $('.save-item').on('click', function () {
+            //console.log("DD");
+            var tr = $(this).parents('tr:first');
+            var plan = $(this).prop('id');
+            //var txtAgent = tr.find('#txtAgentName-Edit');
+            var dpAgent = tr.find('#dpAgentName-Edit').val();
+            var dpShop = tr.find('#dpShopName-Edit').val();
+
+            if (dpAgent <= 0) {
+                alert("Delivery Agent can not be blank.");
+            }
+            else if (dpShop <= 0) {
+                alert("Shop Name can not be blank.");
+            }
+            else {
+                $.post(
+                    '/DeliveryAgents/ReassignUpdate',
+                    { plan: plan, agent: dpAgent, shop: dpShop },
+                    function (item) {
+                        tr.find('#txtAgentId').text(item.agent);
+                        $('#dpAgentName-Edit').val(item.agent).attr("selected", "selected");
+                         $('#dpShopName-Edit').val(item.shop).attr("selected", "selected");
+                        $('#lblAgentName').html(item.agentname);
+                        $('#lblShopName').html(item.shopname);
+                    }, "json");
+            }
+            tr.find('.edit-mode, .display-mode').toggle();
+        });
+        $('.delete-item').on('click', function () {
+            if (confirm("Are you sure do you want to delete the item.")) {
+                var tr = $(this).parents('tr:first');
+                console.log($(this))
+                var plan = $(this).prop('id');
+                $.post(
+                    '/DeliveryAgents/DeleteFromRoutePlan', { plan: plan},
+                    function (item) {
+                        if (item != undefined && item.status == true) {
+                            window.location.reload();
+                        }
+                    }, "json");
+            }
+            window.location.reload();
+        });
+    </script>
+}

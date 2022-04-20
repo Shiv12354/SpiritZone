@@ -1,0 +1,151 @@
+﻿@model IEnumerable<RainbowWine.Services.DO.NotifyOrderDO>
+
+@{
+    ViewBag.Title = "Notify";
+}
+
+<h2>Notify</h2>
+<input type="checkbox" id="chkPremium" name="chkPremium" @(ViewBag.IsPremium?"checked":"")/> IsPremium 
+<p>
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Customer Name
+        </th>
+        <th>
+            Phone No.
+        </th>
+        <th>
+            Product Name
+        </th>
+        <th>
+            Shop Name
+        </th>
+        <th>
+            IsNotify
+        </th>
+        <th>
+            Created Date
+        </th>
+        <th>
+            Modified Date
+        </th>
+        <th>
+            QtyAvailable
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Customer.CustomerName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Customer.ContactNo)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.ProductDetail.ProductName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Shop.ShopName)
+    </td>
+    <td>
+        @(item.Notify.IsNotified ?? false ? "Yes":"No")
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Notify.CreatedDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Notify.ModifiedDate)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Inventory.QtyAvailable)
+    </td>
+    <td>
+        <input type="button" value="Called" data-toggle="modal" class="calldone" data-target="#myModal" id="btnCalled"
+               data-notify="@item.NotifyId" />
+        <input type="button" value="Close" data-toggle="modal" class="colsedone" data-target="#myModal" id="btnClose"
+               data-notify="@item.NotifyId" />
+    </td>
+</tr>
+    }
+
+</table>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Notify</h4>
+            </div>
+            <div class="modal-body">
+                <!-- The Modal text box-->
+                <textarea id="modal-text" value="" cols="40" rows="5"  style="width:300px; height:100px;" placeholder="please enter comment"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button id="submit-button" type="button" class="btn btn-default">Submit</button>
+                <button id="close-button" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section scripts{
+    <script>
+        $('#chkPremium').click(function () {
+            const url = window.location.origin + window.location.pathname;
+            window.location = url +"?chkPremium="+$(this).prop('checked');
+        });
+        $('.calldone').click(function () {
+
+            var id = $(this).attr('data-notify');
+            $('#modal-text').attr('data-notify', id);
+            $('#modal-text').attr('data-remark', "Called: ");
+            $('#model').model('show');
+            return false;
+        });
+        $('.colsedone').click(function () {
+
+            var id = $(this).attr('data-notify');
+            $('#modal-text').attr('data-notify', id);
+            $('#modal-text').attr('data-remark', "Close: ");
+            $('#model').model('show');
+            return false;
+        });
+
+        $('#submit-button').click(function () {
+            var comment = $('#modal-text').val();
+            var id = $("#modal-text").attr('data-notify');
+            comment = $("#modal-text").attr('data-remark') + comment;
+            if (comment == '') {
+                alert('Please enter comment.')
+                return false;
+            }
+            if (confirm('Are you sure, do you want to update the notify.')) {
+                $.post(
+                    '/ProductDetails/NotifyCalled',
+                    { NotifyId: id, Remark: comment },
+                    function (item) {
+                        if (item != undefined) {
+                            if (item.status) {
+                                alert('Notify updated successfully.')
+                                window.location.reload();
+                            }
+                            else {
+                                alert(item.msg)
+                            }
+                        }
+                    }, "json");
+            }
+            else { return; }
+            document.getElementById('close-button').click();
+        });
+    </script>
+
+}

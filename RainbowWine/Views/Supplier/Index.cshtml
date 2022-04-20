@@ -1,0 +1,75 @@
+﻿@model IEnumerable<RainbowWine.Data.MixerDetail>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ModifiedDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsDelete)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsShowcaseView)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ShopId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Mixer.MixerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MixerSize.Capacity)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ModifiedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Price)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsDelete)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsShowcaseView)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShopId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Mixer.MixerName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MixerSize.Capacity)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.MixerDetailId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.MixerDetailId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.MixerDetailId })
+        </td>
+    </tr>
+}
+
+</table>

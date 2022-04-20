@@ -1,0 +1,103 @@
+﻿@model RainbowWine.Models.DeliveryAgentAssignmentModel
+
+@{
+    ViewBag.Title = "Assignment";
+}
+
+<h2>Assignment</h2>
+@using (Html.BeginForm("Assignment", "DelManager", RestSharp.Method.POST))
+{
+<p>
+    <div class="row">
+        <div class="col-md-3">@Html.DropDownList("dpShopId", (IEnumerable<SelectListItem>)Model.Shops, "Select Shop", htmlAttributes: new { @class = "form-control", @id = "dpShopId" })</div>
+        @if (Model.ShopId > 0)
+        {
+            <div class="col-md-3">@Html.DropDownList("dpAgentId", (IEnumerable<SelectListItem>)Model.DeliveryAgents, "Select Delivery Boy", htmlAttributes: new { @class = "form-control", @id = "dpAgentId" })</div>
+            <div class="col-md-3"><button type="submit" onclick="return validateInputs();">Save</button></div>
+        }
+    </div>
+</p>
+    if (Model.ShopId > 0)
+    {
+    <p>
+        <div class="row">
+
+            <table class="table">
+                <tr>
+                    <th>
+                        Order ID
+                    </th>
+                    <th>
+                        Order Date
+                    </th>
+                    @if (ViewBag.UserType != "DeliverySupervisor")
+                    {
+                        <th>
+                            Customer Addres
+                        </th>
+                    }
+                        <th>
+                            ETA
+                        </th>
+                        <th></th>
+                    </tr>
+
+                @foreach (var item in Model.Orders)
+                {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderDate)
+                </td>
+                @if (ViewBag.UserType != "DeliverySupervisor")
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustAddress.Address)
+                        <div>
+                            @Html.DisplayFor(modelItem => item.CustAddress.Flat)
+                            @Html.DisplayFor(modelItem => item.CustAddress.Landmark)
+                        </div>
+                    </td>
+                }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderEta.Eta)
+                    </td>
+                    <td>
+                        <input type="checkbox" name="oId" value="@item.Id" class="custom-checkbox chkCheckBoxId" />
+                    </td>
+                </tr>
+                }
+
+            </table>
+
+        </div>
+    </p>
+    }
+}
+
+@section scripts{
+    <script>
+        $('#dpShopId').change(function () {
+            var shopid = $('#dpShopId').val();
+            var url = (window.location.origin + window.location.pathname)
+            window.location = url+"?shopId=" + shopid;
+        });
+        function validateInputs() {
+            var shopid = $('#dpShopId').val();
+            var agentid = $('#dpAgentId').val();
+            var isIdSeleted = false;
+            $.each($('.chkCheckBoxId'), function (k, i) {
+                if ($(i).prop('checked')) { isIdSeleted = true;  }
+            });
+            
+            if (agentid == undefined || agentid == '' || shopid == undefined || shopid == '' || isIdSeleted==false) {
+                alert("Please select Delivery Boy and Order Items.")
+                return false;
+            }
+            if (confirm('Are you sure you want to save this?')) { return true;}
+            return false;
+        }
+    </script>
+}
