@@ -7,6 +7,7 @@
     var perpost = ViewBag.PrePost ?? 0;
     var delpickvalue = ViewBag.delpickvalue ?? "";
     var delPayOption = ViewBag.delPayOption ?? "";
+    List<int> ids = ViewBag.OrderIds;
     var txtoverAllDiscount = Model.Ord.DiscountUnit ?? 0;
     var strDiscount = System.Configuration.ConfigurationManager.AppSettings["OverAllDiscount"];
     var overAllDiscount = string.IsNullOrWhiteSpace(strDiscount) ? 0 : Convert.ToInt32(strDiscount);
@@ -17,6 +18,7 @@
     string statuses = System.Configuration.ConfigurationManager.AppSettings["OrderStatuses"];
     var order = Model.Ord;
     double ammt = 0;
+    int index = 0;
     double walletammt = 0;
     if (Model != null && Model.Ord != null)
     {
@@ -497,14 +499,13 @@
         </dd>
         @if (userType != "Agent" && userType != "DeliveryManager")
         {
-            <dt>
-                MobileNo.
-            </dt>
+    <dt>
+        MobileNo.
+    </dt>
 
-            <dd>
-                @Convert.ToInt64(Model.Ord.OrderTo)
-            </dd>
-        }
+                    <dd>
+                        @Convert.ToInt64(Model.Ord.OrderTo)
+                    </dd>}
         <dt>
             Amount
         </dt>
@@ -515,16 +516,14 @@
         </dd>
         @if (Model.Ord.PaymentTypeId == 2)
         {
-            <dt>
-                To be paid:
-            </dt>
-        }
-        else
-        {
-            <dt>
-                Online Payment:
-            </dt>
-        }
+    <dt>
+        To be paid:
+    </dt> }
+                else
+                {
+    <dt>
+        Online Payment:
+    </dt>}
 
         <dd>
             @ammt
@@ -537,15 +536,15 @@
             @walletammt
         </dd>
         @*@if (Model.Ord.WalletAmountUsed > 0 && Model.Ord.WalletAmountUsed != null)
-            {
-                <dt>
-                    Wallet Amount
-                </dt>
+        {
+            <dt>
+                Wallet Amount
+            </dt>
 
-                <dd id="lblOrdAmountDisplay">
-                    @Html.DisplayFor(model => model.Ord.WalletAmountUsed)
-                </dd>
-            }*@
+            <dd id="lblOrdAmountDisplay">
+                @Html.DisplayFor(model => model.Ord.WalletAmountUsed)
+            </dd>
+        }*@
         <dt>
             Status
         </dt>
@@ -584,22 +583,21 @@
         </dd>
         @if (!string.IsNullOrEmpty(Model.Ord.AppVersion))
         {
-            <dt>
-                App Plat Form
-            </dt>
+    <dt>
+        App Plat Form
+    </dt>
 
-            <dd>
-                @Html.DisplayFor(model => model.Ord.AppPlatForm)
-            </dd>
+                    <dd>
+                        @Html.DisplayFor(model => model.Ord.AppPlatForm)
+                    </dd>
 
-            <dt>
-                App Version
-            </dt>
+                                    <dt>
+                                        App Version
+                                    </dt>
 
-            <dd>
-                @Html.DisplayFor(model => model.Ord.AppVersion)
-            </dd>
-        }
+                                                    <dd>
+                                                        @Html.DisplayFor(model => model.Ord.AppVersion)
+                                                    </dd>}
 
         <dt>
             Gift
@@ -608,57 +606,84 @@
         <dd>
             @if (Model.Ord.IsGift == true)
             {
-                <div>Yes</div>
-            }
-            else
-            {
-                <div>No</div>
-            }
+    <div>Yes</div> }
+                else
+                {
+    <div>No</div>            }
         </dd>
         @if (Model.Ord.IsGift == true)
         {
-            <dt>
-                Recipient Name
-            </dt>
+    <dt>
+        Recipient Name
+    </dt>
 
-            <dd>
-                @Html.DisplayFor(model => model.Ord.RecipientName)
-            </dd>
+                    <dd>
+                        @Html.DisplayFor(model => model.Ord.RecipientName)
+                    </dd>
 
-            <dt>
-                Recipient Number
-            </dt>
+                                    <dt>
+                                        Recipient Number
+                                    </dt>
 
-            <dd>
-                @Html.DisplayFor(model => model.Ord.RecipientNumber)
-            </dd>
-        }
+                                                    <dd>
+                                                        @Html.DisplayFor(model => model.Ord.RecipientNumber)
+                                                    </dd>}
         @if (Model.Ord.ProcessedDate != null && Model.Ord.ARNNumber != null)
         {
-            <dt>
-                ARN Number
-            </dt>
+    <dt>
+        ARN Number
+    </dt>
 
-            <dd>
-                @Html.DisplayFor(model => model.Ord.ARNNumber)
-            </dd>
-            <dt>
-                Processed On
-            </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Ord.ARNNumber)
+                    </dd>
+                                    <dt>
+                                        Processed On
+                                    </dt>
 
-            <dd>
-                @Html.DisplayFor(model => model.Ord.ProcessedDate)
-            </dd>
-        }
-        @if (Model.Ord.OrderStatusId == 27 && userType.ToLower() == "shopper" && Model.Ord.PaymentTypeId==1)
+                                                    <dd>
+                                                        @Html.DisplayFor(model => model.Ord.ProcessedDate)
+                                                    </dd>}
+        @if (ids != null && ids.Count > 0)
         {
-            <dt>
-                Full Refund
-            </dt>
-            <dd>
-                @Html.ActionLink("Full Refund", "FullRefund", "Orders", new { id = Model.Ord.Id }, new { onclick = $"return confirm('Are you sure you want to refund this order amount?: {Model.Ord.OrderAmount}');" })
-            </dd>
+    <dt>
+        Related Orders
+    </dt> foreach (var linkOrder in ids)
+                    {
+                        
+                        if (index==0)
+                        {
+                            <dd>
+                                @Html.ActionLink(linkOrder.ToString(), "Details", "Orders", new { id = linkOrder }) 
+                            </dd>
+                            index++;
+                        } 
+                        else if (index==1)
+                        {
+                            <dd>
+                               | @Html.ActionLink(linkOrder.ToString(), "Details", "Orders", new { id = linkOrder }) 
+                            </dd>
+                            index++;
+                        }
+                       else if (index==2)
+                        {
+                            <dd>
+                              | @Html.ActionLink(linkOrder.ToString(), "Details", "Orders", new { id = linkOrder })
+                            </dd>
+                            index++;
+                        }
+
+            }
+
         }
+        @if (Model.Ord.OrderStatusId == 27 && userType.ToLower() == "shopper" && Model.Ord.PaymentTypeId == 1)
+        {
+    <dt>
+        Full Refund
+    </dt>
+                    <dd>
+                        @Html.ActionLink("Full Refund", "FullRefund", "Orders", new { id = Model.Ord.Id }, new { onclick = $"return confirm('Are you sure you want to refund this order amount?: {Model.Ord.OrderAmount}');" })
+                    </dd>}
     </dl>
 
 

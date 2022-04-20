@@ -1734,6 +1734,14 @@ namespace RainbowWine.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Order order = db.Orders.Find(id);
+            if (!string.IsNullOrEmpty(order.OrderGroupId))
+            {
+                List<int> orderids;
+                var ids = db.Orders.Where(x => x.OrderGroupId == order.OrderGroupId && x.Id != order.Id).ToList();
+                orderids = ids.Select(x => x.Id).ToList();
+                ViewBag.OrderIds = orderids;
+
+            }
             var orderDetails = db.OrderDetails.Include(o => o.Order).Include(o => o.ProductDetail).Include(o => o.WineShop).Where(o=>o.OrderId==id)?.ToList();
             var mixerDetails = db.MixerOrderItems.Include(o => o.Order).Include(o => o.MixerDetail).Include(o => o.MixerDetail.Mixer).Include(o=>o.WineShop).Include(o=>o.Supplier)
                 .Where(o=>o.OrderId==id).ToList();
